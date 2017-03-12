@@ -1,0 +1,228 @@
+--- files/README.orig	2014-01-25 22:29:50.000000000 +0100
++++ files/README	2016-09-16 21:49:18.032476000 +0200
+@@ -430,9 +430,10 @@
+ system.
+ 
+ The currently available package managers are 'RPM' for RedHat/RPM-based
+-systems, 'DPKG' for Debian-based systems, 'BSD' for *BSD systems, and
+-'SOLARIS' for Solaris systems. It is also possible to specify 'NONE' to
+-indicate not to use a package manager. The program default is 'NONE'.
++systems, 'DPKG' for Debian-based systems, 'BSD' for *BSD systems, 'BSDng'
++for modern FreeBSD systems using pkgng, and 'SOLARIS' for Solaris systems.
++It is also possible to specify 'NONE' to indicate not to use a package manager.
++The program default is 'NONE'.
+ 
+ Any file which is not part of a package is treated as before, that is,
+ the HASH_CMD configuration file option, or the '--hash' command-line
+--- files/rkhunter.orig	2014-03-12 21:54:55.000000000 +0100
++++ files/rkhunter	2016-09-16 21:49:18.053815000 +0200
+@@ -4838,6 +4838,32 @@
+ 			fi
+ 		fi
+ 		;;
++	BSDNG)
++		PKG_CMD=`find_cmd pkg`
++
++		if [ -z "${PKG_CMD}" ]; then
++			LEAVE=1
++			echo "Unable to find 'pkg' command for package manager 'BSDng'."
++		else
++			${PKG_CMD} -N >/dev/null 2>&1;
++			ERRCODE=$?
++			if [ $ERRCODE -ne 0 ]; then
++				LEAVE=1
++				echo "System not set up for use with package manager 'BSDng'."
++			fi
++		fi
++
++		if [ $CHECK -eq 1 ]; then
++			# If you're using BSDng you're very likely running *BSD,
++			# where sha256 is the command used for the SHA 256 hashing.
++			PKGMGR_SHA256_HASH=`find_cmd sha256`
++
++			if [ -z "${PKGMGR_SHA256_HASH}" ]; then
++				LEAVE=1
++				echo "Unable to find an SHA256 hash function command to assist package manager 'BSD'."
++			fi
++		fi
++		;;
+ 	SOLARIS)
+ 		#
+ 		# For the Solaris package manager, see if we want
+@@ -6343,7 +6369,6 @@
+ 		NODATFILE=1
+ 	fi
+ 
+-
+ 	#
+ 	# Now loop through the pathnames looking for the files.
+ 	#
+@@ -6588,6 +6613,26 @@
+ 				PKGNAME=`echo "${RKHTMPVAR}" | tail ${TAIL_OPT}1 | sed -e 's/[0-9]nb[0-9][0-9]*$//; s/-[0-9.]*$//'`
+ 			fi
+ 			;;
++		BSDNG)
++			#
++			# First see if the file is exempt or part of a known package.
++			#
++
++			if [ $NOVRFYFILE -eq 1 ]; then
++				ERRCODE=1
++			else
++				RKHTMPVAR=`${PKG_CMD} which "${FNAME}" 2>/dev/null`
++				ERRCODE=$?
++			fi
++
++			if [ $ERRCODE -eq 0 ]; then
++				#
++				# Now we sort out the base part of the package name.
++				#
++
++				PKGNAME=`echo "${RKHTMPVAR}" | sed -e 's/.* was installed by package //'`
++			fi
++			;;
+ 		SOLARIS)
+ 			#
+ 			# First see if the file is exempt or belongs to a package.
+@@ -6675,6 +6720,16 @@
+ 						test -n "${SYSHASH}" && FILE_IS_PKGD=1
+ 					fi
+ 					;;
++				BSDNG)
++					#
++					# If we have a package name, get the hash value.
++					#
++
++					if [ -n "${PKGNAME}" ]; then
++						SYSHASH=`${PKG_CMD} query '%Fp\n%Fs' 2>/dev/null | grep -A 1 -x -F "${FNAME}" 2>/dev/null | tail ${TAIL_OPT}1`
++						test -n "${SYSHASH}" && FILE_IS_PKGD=1
++					fi
++					;;
+ 				SOLARIS)
+ 					#
+ 					# If we are to use the stored 16-bit checksum, then
+@@ -10723,6 +10778,34 @@
+ 						fi
+ 					fi
+ 					;;
++				BSDNG)
++					#
++					# First see if the file is exempt or part of a known package.
++					#
++
++					if [ $NOVRFYFILE -eq 1 ]; then
++						PKGNAME=""
++					else
++						PKGNAME=`${PKG_CMD} which "${FNAME}" 2>/dev/null | sed -e 's/.* was installed by package //'`
++					fi
++
++					if [ -n "${PKGNAME}" ]; then
++						SYSHASH=`${PKG_CMD} query '%Fp\n%Fs' 2>/dev/null | grep -A 1 -x -F "${FNAME}" 2>/dev/null | tail ${TAIL_OPT}1`
++
++						if [ -n "${SYSHASH}" ]; then
++							FILE_IS_PKGD=1
++							RKHTMPVAR=`${PKGMGR_SHA256_HASH} "${FNAME}" 2>/dev/null | cut -d' ' -f $HASH_FLD_IDX`
++
++							if [ "${RKHTMPVAR}" != "${SYSHASH}" ]; then
++								PKGMGR_VERIFY_RESULT="5"
++
++								if [ -n "`${PKGMGR_SHA256_HASH} "${FNAME}" 2>&1 | egrep 'prelink.* (dependenc|adjusting unfinished)'`" ]; then
++									DEPENDENCY_ERR=1
++								fi
++							fi
++						fi
++					fi
++					;;
+ 				SOLARIS)
+ 					#
+ 					# We only use the Solaris package manager
+@@ -17782,7 +17865,7 @@
+ 	    killall ksyms kudzu last lastlog ldd less links locate logger login
+ 	    ls lsattr lsmod lsof lynx mail md5 md5sum mktemp mlocate modinfo
+ 	    modload modprobe modstat modunload more mount mv netstat newgrp
+-	    newsyslog nologin passwd perl pgrep ping pkgdb pkg_info pkill prelink ps pstree pwck
++	    newsyslog nologin passwd perl pgrep ping pkgdb pkg pkg_info pkill prelink ps pstree pwck
+ 	    pwd readlink rkhunter rmmod route rpm rsyslogd runcon runlevel sed sestatus sh
+ 	    sha1 sha1sum sha224 sha224sum sha256 sha256sum sha384 sha384sum sha512
+ 	    sha512sum size skdet slocate sockstat sort ssh sshd stat strace strings su sudo
+@@ -18271,7 +18354,8 @@
+ 	echo $ECHOOPT "   --ns, --nosummary                   Do not show the summary of check results"
+ 	echo $ECHOOPT " --novl, --no-verbose-logging          No verbose logging"
+ 	echo $ECHOOPT "         --pkgmgr {RPM | DPKG | BSD |  Use the specified package manager to obtain or"
+-	echo $ECHOOPT "                   SOLARIS | NONE}     verify file property values. (Default is NONE)"
++	echo $ECHOOPT "                   BSDng | SOLARIS |   verify file property values."
++	echo $ECHOOPT "                   NONE}               (Default is NONE)"
+ 	echo $ECHOOPT "         --propupd [file | directory | Update the entire file properties database,"
+ 	echo $ECHOOPT "                    package]...        or just for the specified entries"
+ 	echo $ECHOOPT "     -q, --quiet                       Quiet mode (no output at all)"
+@@ -18398,6 +18482,7 @@
+ PRELINK_CMD=""
+ PRELINK_HASH=""
+ PKGMGR_MD5_HASH=""
++PKGMGR_SHA256_HASH=""
+ MD5_CMD=""
+ EPOCH_DATE_CMD=""
+ PKGMGRNOVRFY=""
+@@ -20010,6 +20095,9 @@
+ 			BSD)
+ 				display --to LOG --type INFO FOUND_CMD 'pkg-info' "${PKG_CMD}"
+ 				;;
++			BSDNG)
++				display --to LOG --type INFO FOUND_CMD 'pkg' "${PKG_CMD}"
++				;;
+ 			SOLARIS)
+ 				if [ $USE_SUNSUM -eq 1 ]; then
+ 					display --to LOG --type INFO HASH_PKGMGR_SUM
+@@ -20051,6 +20139,10 @@
+ 				display --to LOG --type INFO FOUND_CMD 'pkg-info' "${PKG_CMD}"
+ 				display --to LOG --type INFO HASH_PKGMGR_MD5 "${PKGMGR_MD5_HASH}"
+ 				;;
++			BSDNG)
++				display --to LOG --type INFO FOUND_CMD 'pkg' "${PKG_CMD}"
++				display --to LOG --type INFO HASH_PKGMGR_SHA256 "${PKGMGR_SHA256_HASH}"
++				;;
+ 			SOLARIS)
+ 				if [ $USE_SUNSUM -eq 1 ]; then
+ 					display --to LOG --type INFO HASH_PKGMGR_SUM
+--- files/rkhunter.8.orig	2014-01-03 22:26:10.000000000 +0100
++++ files/rkhunter.8	2016-09-16 21:49:18.055818000 +0200
+@@ -305,7 +305,7 @@
+ \fBrkhunter\fP. However, the log file will contain less information should any
+ warnings occur. By default verbose logging is enabled.
+ 
+-.IP "\fB\-\-pkgmgr {RPM | DPKG | BSD | SOLARIS | NONE}\fP"
++.IP "\fB\-\-pkgmgr {RPM | DPKG | BSD | BSDng | SOLARIS | NONE}\fP"
+ This option is used during the file properties check or when the
+ \fB\-\-propupd\fP command option is given. It tells \fBrkhunter\fP that the
+ current file property values should be obtained from the relevant package manager.
+--- files/rkhunter.conf.orig	2016-09-16 21:48:32.879367000 +0200
++++ files/rkhunter.conf	2016-09-16 21:49:18.058305000 +0200
+@@ -400,12 +400,14 @@
+ # properties file ('rkhunter.dat'), and when running the file properties check.
+ # For RedHat/RPM-based systems, 'RPM' can be used to get information from the
+ # RPM database. For Debian-based systems 'DPKG' can be used, for *BSD systems
+-# 'BSD' can be used, and for Solaris systems 'SOLARIS' can be used. No value,
++# 'BSD' can be used, for new FreeBSD systems using pkgng BSDng can be used,
++# and for Solaris systems 'SOLARIS' can be used. No value,
+ # or a value of 'NONE', indicates that no package manager is to be used.
+ #
+-# The current package managers, except 'SOLARIS', store the file hash values
+-# using an MD5 hash function. The Solaris package manager includes a checksum
+-# value, but this is not used by default (see USE_SUNSUM below).
++# The current package managers, except 'SOLARIS' and BSDng, store the file hash
++# values using an MD5 hash function. The Solaris package manager includes a
++# checksum value, but this is not used by default (see USE_SUNSUM below).
++# The 'BSDng' package manager uses SHA256 hashes.
+ #
+ # The 'DPKG' and 'BSD' package managers only provide MD5 hash values.
+ # The 'RPM' package manager additionally provides values for the inode,
+--- files/i18n/en.orig	2014-02-24 02:22:34.000000000 +0100
++++ files/i18n/en	2016-09-16 21:49:18.037352000 +0200
+@@ -108,6 +108,7 @@
+ 
+ HASH_PKGMGR:Using package manager '$1' for file property checks
+ HASH_PKGMGR_MD5:Using MD5 hash function command '$1' to assist package manager verification
++HASH_PKGMGR_SHA256:Using SHA256 hash function command '$1' to assist package manager verification
+ HASH_PKGMGR_SUM:Using the stored 16-bit checksum for package verification
+ HASH_PKGMGR_NOT_SPEC:No package manager specified: using hash function '$1'
+ HASH_PKGMGR_NOT_SPEC_PRELINKED:No package manager specified: using prelink command with '$1'

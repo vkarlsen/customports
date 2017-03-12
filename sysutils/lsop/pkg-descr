@@ -1,0 +1,5 @@
+lsop is a FreeBSD utility to list all processes running with outdated binaries
+or shared libraries (that is, binaries or shared libraries have been upgraded
+or simply deleted).
+
+WWW: https://github.com/606u/lsop

@@ -1,0 +1,2 @@
+dbbackup is a small and simple shell script for backing up
+PostGreSQL databases.

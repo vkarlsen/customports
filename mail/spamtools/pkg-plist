@@ -1,0 +1,3 @@
+bin/addspammer
+bin/fetchtraplist
+@dir etc/traplists
