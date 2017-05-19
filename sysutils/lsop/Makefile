@@ -15,10 +15,6 @@ USE_GITHUB=	yes
 GH_ACCOUNT=	606u
 GH_TAGNAME=	v0.2
 
-# WRKSRC=		${WRKDIR}/${PORTNAME}-${GH_TAGNAME}
-
-# .include <bsd.port.pre.mk>
-
 PLIST_FILES=	sbin/lsop \
 				libexec/nagios/check_restart
 
