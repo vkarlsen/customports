@@ -1,9 +1,9 @@
 # Created by: Radim Kolar
-# $FreeBSD: head/security/rkhunter/Makefile 418767 2016-07-19 11:04:13Z mat $
+# $FreeBSD$
 
 PORTNAME=	rkhunter
 PORTVERSION=	1.4.2
-PORTREVISION=	3
+PORTREVISION=	4
 CATEGORIES=	security
 MASTER_SITES=	SF
 
