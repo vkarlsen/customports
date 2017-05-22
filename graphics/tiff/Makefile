@@ -3,7 +3,7 @@
 
 PORTNAME=	tiff
 PORTVERSION=	4.0.7
-PORTREVISION=	5
+PORTREVISION=	6
 CATEGORIES=	graphics
 
 MAINTAINER=	vidar@karlsen.tech
@@ -17,7 +17,7 @@ LIB_DEPENDS=	libjbig.so:graphics/jbigkit
 USE_GITHUB=	yes
 GH_ACCOUNT=	vadz
 GH_PROJECT=	libtiff
-GH_TAGNAME=	85e569c
+GH_TAGNAME=	4a25fa0
 
 USES=		cpe jpeg libtool pathfix
 CPE_PRODUCT=	libtiff
