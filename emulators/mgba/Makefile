@@ -13,16 +13,16 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 INSTALLS_ICONS=	yes
 
-LIB_DEPENDS+=libepoxy.so:graphics/libepoxy
-LIB_DEPENDS+=libavcodec.so:multimedia/ffmpeg
-LIB_DEPENDS+=libavformat.so:multimedia/ffmpeg
-LIB_DEPENDS+=libavresample.so:multimedia/ffmpeg
-LIB_DEPENDS+=libavutil.so:multimedia/ffmpeg
-LIB_DEPENDS+=libswscale.so:multimedia/ffmpeg
-LIB_DEPENDS+=libMagickWand-6.so:graphics/ImageMagick
-LIB_DEPENDS+=libMagickCore-6.so:graphics/ImageMagick
-LIB_DEPENDS+=libpng16.so:graphics/png
-LIB_DEPENDS+=libzip.so:archivers/libzip
+LIB_DEPENDS=	libepoxy.so:graphics/libepoxy \
+				libavcodec.so:multimedia/ffmpeg \
+				libavformat.so:multimedia/ffmpeg \
+				libavresample.so:multimedia/ffmpeg \
+				libavutil.so:multimedia/ffmpeg \
+				libswscale.so:multimedia/ffmpeg \
+				libMagickWand-6.so:graphics/ImageMagick \
+				libMagickCore-6.so:graphics/ImageMagick \
+				libpng16.so:graphics/png \
+				libzip.so:archivers/libzip
 
 USES=	cmake:outsource libedit
 
@@ -32,8 +32,6 @@ GH_ACCOUNT=	mgba-emu
 USE_SDL=	sdl2
 USE_GL=		glu gl
 USE_QT5=	qmake opengl network widgets gui core buildtools linguisttools
-
-#DOCSDIR=	${STAGEDIR}${PREFIX}/share/doc/mgba
 
 do-build:
 	${MKDIR} ${WRKSRC}/build && \
