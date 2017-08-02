@@ -11,7 +11,6 @@ COMMENT=	Vim-inspired, selection-oriented code editor
 LICENSE=	UNLICENSE
 LICENSE_NAME=	UNLICENSE
 LICENSE_FILE=	${WRKSRC}/UNLICENSE
-LICENSE_PERMS=	dist-mirror dist-sell pkg-mirror pkg-sell auto-accept
 
 LIB_DEPENDS=	libboost_regex.so:devel/boost-libs
 BUILD_DEPENDS=	${LOCALBASE}/include/boost/regex.hpp:devel/boost-libs	\
