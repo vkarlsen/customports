@@ -9,7 +9,6 @@ MAINTAINER=	vidar@karlsen.tech
 COMMENT=	Vim-inspired, selection-oriented code editor
 
 LICENSE=	UNLICENSE
-LICENSE_NAME=	UNLICENSE
 LICENSE_FILE=	${WRKSRC}/UNLICENSE
 
 LIB_DEPENDS=	libboost_regex.so:devel/boost-libs
