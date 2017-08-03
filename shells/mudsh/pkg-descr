@@ -1,0 +1,10 @@
+A MUD based shell, rescued from the pages of time. The original hosting site, 
+xirium.com, seems to be dead since ~2008.
+
+Is there any reason why a shell (or command line) cannot be as tolerant or as
+intelligent as a text adventure game like Zork, or a MUD [Multi User Dungeon]?
+Is there any reason why a shell cannot work like such a game? ("Go North",
+etc.) Actually, no and we have the implementation to prove it. Have fun, and 
+don't get eaten by a Grue!
+
+WWW: https://web.archive.org/web/20040831083346/http://www.xirium.com/tech/mud-shell/download/

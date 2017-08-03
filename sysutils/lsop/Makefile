@@ -9,15 +9,11 @@ MAINTAINER=	vidar@karlsen.tech
 COMMENT=	Lists processes running with outdated binaries or shared libraries
 
 LICENSE=	BSD2CLAUSE
-LICENSE_FILE=	${FILESDIR}/LICENSE
+LICENSE_FILE=	${WRKSRC}/LICENSE
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	606u
 GH_TAGNAME=	v0.2
-
-# WRKSRC=		${WRKDIR}/${PORTNAME}-${GH_TAGNAME}
-
-# .include <bsd.port.pre.mk>
 
 PLIST_FILES=	sbin/lsop \
 				libexec/nagios/check_restart
