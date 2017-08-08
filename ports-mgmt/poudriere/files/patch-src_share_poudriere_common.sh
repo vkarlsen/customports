@@ -5,7 +5,7 @@
  			;;
  		extract)
 -			max_execution_time=3600
-+			max_execution_time=14400
++			max_execution_time=28800
  			chown -R ${JUSER} ${mnt}/wrkdirs
  			;;
  		configure) [ -n "${PORTTESTING}" ] && markfs prebuild ${mnt} ;;
@@ -14,13 +14,13 @@
  		stage) [ -n "${PORTTESTING}" ] && markfs prestage ${mnt} ;;
  		install)
 -			max_execution_time=3600
-+			max_execution_time=14400
++			max_execution_time=28800
  			JUSER=root
  			[ -n "${PORTTESTING}" ] && markfs preinst ${mnt}
  			;;
  		package)
 -			max_execution_time=7200
-+			max_execution_time=14400
++			max_execution_time=28800
  			if [ -n "${PORTTESTING}" ] &&
  			    [ -z "${no_stage}" ]; then
  				check_fs_violation ${mnt} prestage "${port}" \
@@ -29,7 +29,7 @@
  			;;
  		deinstall)
 -			max_execution_time=3600
-+			max_execution_time=14400
++			max_execution_time=28800
  			JUSER=root
  			# Skip for all linux ports, they are not safe
  			if [ "${PKGNAME%%*linux*}" != "" ]; then
