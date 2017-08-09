@@ -143,6 +143,8 @@ post-patch:
 
 post-install:
 	${INSTALL_DATA} ${WRKSRC}/docs/libcurl/libcurl.m4 ${STAGEDIR}${PREFIX}/share/aclocal/
+	make -C${WRKSRC}/docs/libcurl install-man DESTDIR=${STAGEDIR}
+	make -C${WRKSRC}/docs/libcurl/opts install-man DESTDIR=${STAGEDIR}
 
 post-install-DOCS-on:
 	${MKDIR} ${STAGEDIR}${DOCSDIR}/ ${STAGEDIR}${DOCSDIR}/libcurl/
