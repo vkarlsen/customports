@@ -1,8 +1,10 @@
-# Custom patch set by Vidar Karlsen <vidar@karlsen.tech>
+# Created by: Vidar Karlsen <vidar@karlsen.tech> (custom patch set)
 # $FreeBSD$
 
 PORTNAME=	lsop
 PORTVERSION=	0.2
+DISTVERSIONPREFIX=	v
+PORTREVISION=	1
 CATEGORIES=	sysutils
 
 MAINTAINER=	vidar@karlsen.tech
@@ -13,10 +15,9 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	606u
-GH_TAGNAME=	v0.2
 
 PLIST_FILES=	sbin/lsop \
-				libexec/nagios/check_restart
+		libexec/nagios/check_restart
 
 post-patch:
 	${REINPLACE_CMD} -e 's|lsop|${PREFIX}/sbin/lsop|' ${WRKSRC}/check_restart
