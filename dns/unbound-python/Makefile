@@ -6,7 +6,7 @@ PKGNAMESUFFIX+=	-python
 MAINTAINER=	vidar@karlsen.tech
 COMMENT=	Validating, recursive, and caching DNS resolver (python pkg)
 
-OPTIONS_DEFAULT=PYTHON
+OPTIONS_SLAVE=	PYTHON
 
 MASTERDIR=	${.CURDIR}/../unbound
 
