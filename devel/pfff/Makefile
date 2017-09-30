@@ -23,7 +23,7 @@ GH_ACCOUNT=		facebook
 
 do-build:
 	cd ${WRKSRC} && \
-	./configure --prefix=${PREFIX} --novisual && \
+	./configure --prefix=${PREFIX} && \
 	${GMAKE} depend && \
 	${GMAKE} && \
 	${GMAKE} opt
