@@ -1,0 +1,8 @@
+--- Makefile.orig	2017-10-14 15:23:21 UTC
++++ Makefile
+@@ -1,4 +1,5 @@
+ CFLAGS := -g -O2 -Wall
++LDFLAGS := -L/usr/local/lib
+ LDLIBS := -llz4
+ 
+ lz4jsoncat: lz4jsoncat.c
