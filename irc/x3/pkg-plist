@@ -1,0 +1,29 @@
+@dir x3
+x3/x3
+x3/chanserv.help
+x3/global.help
+x3/mail.help
+x3/mod-helpserv.help
+x3/mod-memoserv.help
+x3/mod-python.help
+x3/mod-qserver.help
+x3/mod-snoop.help
+x3/mod-sockcheck.help
+x3/mod-webtv.help
+x3/modcmd.help
+x3/nickserv.help
+x3/opserv.help
+x3/saxdb.help
+x3/sendmail.help
+x3/spamserv.help
+@sample x3/x3.conf.sample
+@sample x3/sockcheck.conf.sample
+%%MODULES%%x3/modpython.py
+%%MODULES%%x3/plugins/README
+%%MODULES%%x3/plugins/__init__.py
+%%MODULES%%x3/plugins/annoy/__init__.py
+%%MODULES%%x3/plugins/hangman/__init__.py
+%%MODULES%%x3/plugins/annoy/plugin.py
+%%MODULES%%x3/plugins/hangman/plugin.py
+%%MODULES%%@dir x3/plugins/annoy
+%%MODULES%%@dir x3/plugins/hangman

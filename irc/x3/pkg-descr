@@ -1,0 +1,7 @@
+X3 is a complete set of services for Nefarious IRCu P10 protocol
+networks based on srvx irc services.. It aims to be highly efficient,
+flexible, and extensible. Features include advanced proxy detection
+and all the standard services users expect e.g. ChanServ, NickServ,
+OpServ, HelpServ, and Global.
+
+WWW: https://github.com/evilnet/x3
