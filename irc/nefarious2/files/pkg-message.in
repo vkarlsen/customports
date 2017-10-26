@@ -4,13 +4,6 @@ When running on FreeBSD, ircu can make use of the kqueue() event engine, which
 results in much improved performance over the old poll()-based method. kqueue
 is included in the more recent 4.x releases of FreeBSD.
 
-In order for ircu to be able to serve many clients simultaneously, you need
-to increase the maximum allowable number of open files in the system. To do
-this, add commands such as the following during your system's boot sequence:
-
-sysctl -w kern.maxfiles=16384
-sysctl -w kern.maxfilesperproc=16384
-
 Unless you will be serving thousands of clients simultaneously, you will not
 need to do the following, unless of course you just can't stand having a
 system that is not optimized to its limits :)
@@ -26,10 +19,17 @@ options         ICMP_BANDLIM
 
 Also, you may wish to run the following at system startup:
 
-sysctl -w net.inet.tcp.rfc1323=1
-sysctl -w net.inet.tcp.delayed_ack=0
-sysctl -w net.inet.tcp.restrict_rst=1
-sysctl -w kern.ipc.maxsockbuf=2097152
-sysctl -w kern.ipc.somaxconn=2048
+sysctl net.inet.tcp.rfc1323=1
+sysctl net.inet.tcp.delayed_ack=0
+sysctl kern.ipc.maxsockbuf=2097152
+sysctl kern.ipc.somaxconn=2048
 
 Created by Sengaia <sengaia@undernet.org>, July 20 2002.
+
+
+Creating SSL certificate
+
+A script to create SSL certificates has been placed in
+%%PREFIX%%/etc/%%PORTNAME%%/makepem
+It will generate a certificate and save it to
+%%PREFIX%%/etc/%%PORTNAME%%/ircd.pem

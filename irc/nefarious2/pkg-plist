@@ -2,6 +2,7 @@ bin/convert-conf
 bin/ircd
 bin/umkpasswd
 @sample %%ETCDIR%%/ircd.conf.sample
+%%ETCDIR%%/makepem
 %%PORTDOCS%%%%DOCSDIR%%/Authors
 %%PORTDOCS%%%%DOCSDIR%%/Authors.nefarious
 %%PORTDOCS%%%%DOCSDIR%%/api/api.txt

@@ -1,0 +1,60 @@
+--- tools/makepem/makepem.orig	2017-09-23 19:36:50 UTC
++++ tools/makepem/makepem
+@@ -1,22 +1,7 @@
+ #! /bin/sh
+ #* $Id$
+ 
+-
+-case $# in
+-0|1)      echo 'Usage: makepem /dpath /top_srcdir' 1>&2; exit 2
+-esac
+-
+-
+-if test -f $2/config.h
+-then
+-  grep USE_SSL $2/config.h | awk '{
+-    if ($1 != "#define") {
+-      printf "SSL Disabled, Skipping makepem Generation\n"
+-      system("touch /tmp/ssltempdata")
+-    }
+-  }'
+-fi
+-
++DEST="/usr/local/etc/nefarious2"
+ 
+ if test -f /tmp/ssltempdata
+ then
+@@ -24,19 +9,19 @@ then
+ else
+   echo 'Generating ircd.pem...'
+ 
+-  if test -f $1/ircd.pem
++  if test -f $DEST/ircd.pem
+   then
+     echo 'ircd.pem already exists, exiting. Remove ircd.pem and run make install again to create a new one'
+     exit 0;
+   fi
+ 
+-  echo Press Y if you want to use an SSL certificate that already exists; read sslans
++  echo Press Y if you want to use an SSL certificate that already exists, otherwise press enter:; read sslans
+ 
+   if [ "$sslans" != "Y" ]; then
+-    openssl req -new -x509 -days 365 -nodes -out $1/ircd.pem -keyout $1/ircd.pem
+-    test 1 -eq 1 || test ! -f /dev/urandom || openssl gendh -rand $1/ircd.rand 512 >> $1/ircd.pem
+-    test 1 -eq 1 || test -f /dev/urandom || openssl gendh 512 >> $1/ircd.pem
+-    openssl x509 -subject -dates -fingerprint -noout -in $1/ircd.pem
++    openssl req -new -x509 -days 365 -nodes -out $DEST/ircd.pem -keyout $DEST/ircd.pem
++    test 1 -eq 1 || test ! -f /dev/urandom || openssl gendh -rand $DEST/ircd.rand 512 >> $DEST/ircd.pem
++    test 1 -eq 1 || test -f /dev/urandom || openssl gendh 512 >> $DEST/ircd.pem
++    openssl x509 -subject -dates -fingerprint -noout -in $DEST/ircd.pem
+   else
+     FileExist=FALSE
+     while [ "$FileExist" == "FALSE" ];
+@@ -49,6 +34,6 @@ else
+         echo File Does Not Exist
+       fi
+     done
+-    cp $sslpath $1/ircd.pem
++    cp $sslpath $DEST/ircd.pem
+   fi
+ fi
