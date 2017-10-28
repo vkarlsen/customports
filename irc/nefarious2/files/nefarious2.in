@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# $FreeBSD$
+#
+# PROVIDE: nefarious2
+# REQUIRE: DAEMON
+# BEFORE:  LOGIN
+# KEYWORD: shutdown
+
+. /etc/rc.subr
+
+name=nefarious2
+rcvar=nefarious2_enable
+load_rc_config $name
+
+nefarious2_enable=${nefarious2_enable:-"NO"}
+nefarious2_user=${nefarious2_user:-"ircd"}
+nefarious2_group=${nefarious2_group:-"ircd"}
+
+command="%%PREFIX%%/bin/ircd"
+pidfile=%%RUNDIR%%/ircd.pid
+required_files="%%PREFIX%%/etc/nefarious2/ircd.conf"
+
+start_precmd=prestart
+stop_precmd="rm -f ${pidfile}"
+
+prestart()
+{
+    for i in %%LOGDIR%% %%RUNDIR%%; do
+        install -d -o ${nefarious2_user} -g ${nefarious2_group} ${i}
+    done
+}
+
+run_rc_command "$1"
