@@ -13,7 +13,7 @@ LICENSE=		GPLv3
 GNU_CONFIGURE=		yes
 
 USES=			cpe
-CVE_VENDOR=		nefarious2_project
+CPE_VENDOR=		nefarious2_project
 USE_RC_SUBR=		nefarious2
 
 USE_GITHUB=		yes
