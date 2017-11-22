@@ -1,4 +1,4 @@
---- src/upgrade.c.orig	2017-03-08 20:18:53 UTC
+--- src/upgrade.c.orig	2017-11-22 19:02:54 UTC
 +++ src/upgrade.c
 @@ -411,7 +411,7 @@ exec_upgrade(int argc, char **argv)
  				nbactions, pkg_jobs_total(jobs));

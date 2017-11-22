@@ -1,4 +1,4 @@
---- src/check.c.orig	2017-03-08 20:19:45 UTC
+--- src/check.c.orig	2017-10-06 12:00:58 UTC
 +++ src/check.c
 @@ -203,7 +203,7 @@ fix_deps(struct pkgdb *db, struct deps_e
  	print_jobs_summary(jobs,

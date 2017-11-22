@@ -1,4 +1,4 @@
---- src/fetch.c.orig	2017-03-08 20:20:24 UTC
+--- src/fetch.c.orig	2017-10-06 12:00:58 UTC
 +++ src/fetch.c
 @@ -205,11 +205,11 @@ exec_fetch(int argc, char **argv)
  		    "The following packages will be fetched:\n\n");

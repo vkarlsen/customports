@@ -1,4 +1,4 @@
---- src/install.c.orig	2017-03-08 20:19:09 UTC
+--- src/install.c.orig	2017-11-15 09:56:10 UTC
 +++ src/install.c
 @@ -232,7 +232,7 @@ exec_install(int argc, char **argv)
  			    nbactions, pkg_jobs_total(jobs));

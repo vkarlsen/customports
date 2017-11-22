@@ -1,9 +1,9 @@
-# $FreeBSD: head/ports-mgmt/pkg/Makefile 437007 2017-03-26 21:25:47Z bapt $
+# $FreeBSD: head/ports-mgmt/pkg/Makefile 454228 2017-11-15 10:04:54Z bapt $
 
 PORTNAME=	pkg
-DISTVERSION=	1.10.1
-_PKG_VERSION=	${DISTVERSION}
+DISTVERSION=	1.10.2
 PORTREVISION=	1
+_PKG_VERSION=	${DISTVERSION}
 CATEGORIES=	ports-mgmt
 MASTER_SITES=	\
 		http://files.etoilebsd.net/${PORTNAME}/ \
@@ -34,7 +34,7 @@ EXTRA_PATCHES=	${FILESDIR}/extra-patch-docs_pkg.8
 
 .include <bsd.port.pre.mk>
 
-.if defined(WITH_DEBUG) && !defined(WITHOUT_DEBUG)
+.if defined(WITH_DEBUG)
 MAKE_ARGS+=	DEBUG_FLAGS="${DEBUG_FLAGS}"
 .endif
 
