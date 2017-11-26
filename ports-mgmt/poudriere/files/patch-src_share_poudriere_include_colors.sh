@@ -1,6 +1,6 @@
---- src/share/poudriere/include/colors.sh.orig	2017-08-09 13:17:19 UTC
+--- src/share/poudriere/include/colors.sh.orig	2017-11-11 17:07:32 UTC
 +++ src/share/poudriere/include/colors.sh
-@@ -77,6 +77,10 @@ if [ ${USE_COLORS} = "no" ]; then
+@@ -79,6 +79,10 @@ if [ ${USE_COLORS} = "no" ]; then
  	COLOR_FAIL=
  	COLOR_PHASE=
  	COLOR_DRY_MODE=
@@ -11,7 +11,7 @@
  else
  
  	: ${D_LEFT:="${COLOR_BOLD}[${COLOR_RESET}"}
-@@ -92,6 +96,10 @@ else
+@@ -95,6 +99,10 @@ else
  	: ${COLOR_FAIL:=${COLOR_RED}}
  	: ${COLOR_PHASE:=${COLOR_LIGHT_MAGENTA}}
  	: ${COLOR_DRY_MODE:=${COLOR_GREEN}}
