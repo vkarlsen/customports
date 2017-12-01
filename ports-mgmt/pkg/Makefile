@@ -1,4 +1,4 @@
-# $FreeBSD: head/ports-mgmt/pkg/Makefile 454228 2017-11-15 10:04:54Z bapt $
+# $FreeBSD: head/ports-mgmt/pkg/Makefile 455294 2017-12-01 14:10:54Z bapt $
 
 PORTNAME=	pkg
 DISTVERSION=	1.10.2
@@ -31,6 +31,8 @@ CFLAGS+=	-Wno-error
 .if !exists(/usr/include/jail.h)
 EXTRA_PATCHES=	${FILESDIR}/extra-patch-docs_pkg.8
 .endif
+EXTRA_PATCHES+=	${FILESDIR}/0001-Do-not-use-the-origin-at-all-anymore-when-looking-fo.patch:-p1 \
+		${FILESDIR}/0002-Fix-finding-ports-updates-with-flavors.patch:-p1
 
 .include <bsd.port.pre.mk>
 

@@ -1,8 +1,6 @@
-diff --git libpkg/pkg_add.c libpkg/pkg_add.c
-index 87fb248..778336c 100644
---- libpkg/pkg_add.c
+--- libpkg/pkg_add.c.orig	2017-11-15 09:56:10 UTC
 +++ libpkg/pkg_add.c
-@@ -859,14 +859,21 @@ pkg_add_cleanup_old(struct pkgdb *db, struct pkg *old, struct pkg *new, int flag
+@@ -953,14 +953,21 @@ pkg_add_cleanup_old(struct pkgdb *db, st
  	 * Execute pre deinstall scripts
  	 */
  	if ((flags & PKG_ADD_NOSCRIPT) == 0) {
