@@ -1,0 +1,78 @@
+#!/bin/sh
+setvar PORTSDIR "/usr/local/poudriere/ports/HEAD"
+setvar PORTS ""
+setvar CATS "accessibility
+arabic
+archivers
+astro
+audio
+base
+benchmarks
+biology
+cad
+chinese
+comms
+converters
+databases
+deskutils
+devel
+distfiles
+dns
+editors
+emulators
+finance
+french
+ftp
+games
+german
+graphics
+hebrew
+hungarian
+irc
+japanese
+java
+korean
+lang
+mail
+math
+misc
+multimedia
+net
+net-im
+net-mgmt
+net-p2p
+news
+palm
+polish
+ports-mgmt
+portuguese
+print
+russian
+science
+security
+shells
+sysutils
+textproc
+ukrainian
+vietnamese
+www
+x11
+x11-clocks
+x11-drivers
+x11-fm
+x11-fonts
+x11-servers
+x11-themes
+x11-toolkits
+x11-wm"
+
+cd "$PORTSDIR"
+for c in $CATS; do
+    grep -i "ports@freebsd.org" $c/*/Makefile | cut -d/ -f1,2
+done
+cd -
+
+#cd "$PORTSDIR"; grep -F "`for o in \`pkg info -qao\` ; \
+#do echo "|usrports${o}|" ; done`" `make -V INDEXFILE` | \
+#grep -i \|ports@freebsd.org\| | cut -f 2 -d \|
+#cd -
