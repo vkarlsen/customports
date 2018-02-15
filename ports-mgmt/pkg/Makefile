@@ -1,7 +1,7 @@
-# $FreeBSD: head/ports-mgmt/pkg/Makefile 458302 2018-01-06 23:50:22Z bapt $
+# $FreeBSD: head/ports-mgmt/pkg/Makefile 461849 2018-02-15 00:14:49Z brd $
 
 PORTNAME=	pkg
-DISTVERSION=	1.10.4
+DISTVERSION=	1.10.5
 PORTREVISION=	1
 _PKG_VERSION=	${DISTVERSION}
 CATEGORIES=	ports-mgmt
@@ -71,7 +71,12 @@ pre-everything::
 #define PKG_DEPENDS to nothing to avoid infinite loop looking for pkg :)
 PKG_DEPENDS=
 .undef INSTALLS_DEPENDS
+
+# Use the internal pkg instead, generally, unless this is a cross-build,
+# in which case that won't work. Hope for the best then.
+.if !defined(CROSS_TOOLCHAIN)
 PKG_BIN=	${WRKSRC}/src/pkg-static
+.endif
 
 post-install:
 	@${MKDIR} ${STAGEDIR}${DOCSDIR}
