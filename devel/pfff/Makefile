@@ -4,6 +4,7 @@
 PORTNAME=		pfff
 PORTVERSION=		0.29
 DISTVERSIONPREFIX=	v
+PORTREVISION=		1
 CATEGORIES=		devel
 
 MAINTAINER=		vidar@karlsen.tech
@@ -34,3 +35,4 @@ post-install:
 .endfor
 
 .include <bsd.port.mk>
+RUN_DEPENDS:=${RUN_DEPENDS:Ngcc*}
