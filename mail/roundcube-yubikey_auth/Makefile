@@ -5,16 +5,17 @@ PORTNAME=	yubikey_auth
 PORTVERSION=	g20170801
 CATEGORIES=	mail
 PKGNAMEPREFIX=	roundcube-
+PKGNAMESUFFIX=	${PHP_PKGNAMESUFFIX}
 
 MAINTAINER=	vidar@karlsen.tech
 COMMENT=	Roundcube yubikey auth plugin
 
 LICENSE=	GPLv2
 
-BUILD_DEPENDS=	roundcube>=1.0:mail/roundcube
-RUN_DEPENDS=	roundcube>=1.0:mail/roundcube
+BUILD_DEPENDS=	roundcube${PHP_PKGNAMESUFFIX}>=1.0:mail/roundcube@${PHP_FLAVOR}
+RUN_DEPENDS=	roundcube${PHP_PKGNAMESUFFIX}>=1.0:mail/roundcube@${PHP_FLAVOR}
 
-USES=		php
+USES=		php:flavors
 
 USE_PHP=	curl
 
