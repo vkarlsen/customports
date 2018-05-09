@@ -1,9 +1,9 @@
 # Created by: Thomas Gellekum <tg@FreeBSD.org>
-# $FreeBSD: head/ftp/wget/Makefile 462716 2018-02-23 19:23:57Z sunpoet $
+# $FreeBSD: head/ftp/wget/Makefile 469453 2018-05-09 16:18:52Z vd $
 
 PORTNAME=	wget
-DISTVERSION=	1.19.4
-PORTREVISION=	3
+DISTVERSION=	1.19.5
+PORTREVISION=	1
 CATEGORIES=	ftp www ipv6
 MASTER_SITES=	GNU
 EXTRACT_SUFX=	.tar.lz
