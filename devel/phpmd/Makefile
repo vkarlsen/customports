@@ -15,9 +15,8 @@ LICENSE=	BSD3CLAUSE
 
 RUN_DEPENDS=	${PEAR_PKGNAMEPREFIX}pdepend-PHP_Depend>0:devel/pear-PHP_Depend@${PHP_FLAVOR}
 
-USES=		php:build,cli pear:env shebangfix
+USES=		php:build,cli pear:env
 USE_PHP=	phar
-SHEBANG_FILES=	${WRKSRC}/${PORTNAME}.phar
 
 NO_BUILD=	yes
 NO_ARCH=	yes
