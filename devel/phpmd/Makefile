@@ -16,7 +16,7 @@ LICENSE=	BSD3CLAUSE
 RUN_DEPENDS=	${PEAR_PKGNAMEPREFIX}pdepend-PHP_Depend>0:devel/pear-PHP_Depend@${PHP_FLAVOR}
 
 USES=		php:build,cli pear:env
-USE_PHP=	phar
+USE_PHP=	phar ctype
 
 NO_BUILD=	yes
 NO_ARCH=	yes
