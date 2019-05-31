@@ -1,27 +1,28 @@
-# $FreeBSD: head/ports-mgmt/pkg/Makefile 482214 2018-10-16 10:08:01Z bapt $
+# $FreeBSD: head/ports-mgmt/pkg/Makefile 503177 2019-05-31 14:59:44Z bapt $
 
 PORTNAME=	pkg
-DISTVERSION=	1.10.5
-PORTREVISION=	6
+DISTVERSION=	1.11.1
+PORTREVISION=	1
 _PKG_VERSION=	${DISTVERSION}
 CATEGORIES=	ports-mgmt
-MASTER_SITES=	\
-		http://files.etoilebsd.net/${PORTNAME}/ \
-		LOCAL/portmgr \
-		http://mirror.shatow.net/freebsd/${PORTNAME}/ \
+#MASTER_SITES=	\
+#		http://files.etoilebsd.net/${PORTNAME}/ \
+#		LOCAL/portmgr \
+#		http://mirror.shatow.net/freebsd/${PORTNAME}/ \
 
 MAINTAINER=	pkg@FreeBSD.org
 COMMENT=	Package manager
 
 LICENSE=	BSD2CLAUSE
 
+USE_GITHUB=	yes
+GH_ACCOUNT=	freebsd
+
 USE_LDCONFIG=	yes
-USES=		libtool tar:xz
-GNU_CONFIGURE=	yes
-CONFIGURE_ARGS=	--disable-maintainer-mode
-INSTALL_TARGET=	install-strip
+HAS_CONFIGURE=	yes
 PORTDOCS=	NEWS
 PORTSCOUT=	ignore:1
+CONFIGURE_ARGS=	--mandir=${PREFIX}/man
 
 # Use a submake as 'deinstall install' needs to reevaluate PKG_CMD
 # so that pkg-static is used from the wrkdir
@@ -79,10 +80,6 @@ PKG_DEPENDS=
 .if !defined(CROSS_TOOLCHAIN)
 PKG_BIN=	${WRKSRC}/src/pkg-static
 .endif
-
-post-install:
-	@${MV} ${STAGEDIR}${PREFIX}/lib/libpkg_static.a \
-		${STAGEDIR}${PREFIX}/lib/libpkg.a
 
 post-install-DOCS-on:
 	@${MKDIR} ${STAGEDIR}${DOCSDIR}
