@@ -2,7 +2,7 @@
 # $FreeBSD: head/dns/unbound/Makefile 496136 2019-03-18 11:35:49Z swills $
 
 PORTNAME=	unbound
-PORTVERSION=	1.9.1
+PORTVERSION=	1.9.2
 PORTREVISION=	1
 CATEGORIES=	dns
 MASTER_SITES=	https://www.nlnetlabs.nl/downloads/unbound/ \
