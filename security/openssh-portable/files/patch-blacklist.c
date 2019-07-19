@@ -1,4 +1,4 @@
---- blacklist.c.orig	2019-07-19 17:59:50 UTC
+--- blacklist.c.orig	2019-07-19 21:23:24 UTC
 +++ blacklist.c
 @@ -0,0 +1,97 @@
 +/*-

@@ -1,4 +1,4 @@
---- configure.ac.orig	2019-07-19 17:59:50 UTC
+--- configure.ac.orig	2019-07-19 21:23:24 UTC
 +++ configure.ac
 @@ -1625,7 +1625,7 @@ AC_ARG_WITH([libedit],
  			LIBEDIT=`$PKGCONFIG --libs libedit`

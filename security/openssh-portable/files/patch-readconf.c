@@ -1,4 +1,4 @@
---- readconf.c.orig	2019-07-19 17:59:51 UTC
+--- readconf.c.orig	2019-07-19 21:23:24 UTC
 +++ readconf.c
 @@ -2017,7 +2017,7 @@ fill_default_options(Options * options)
  	if (options->batch_mode == -1)

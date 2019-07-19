@@ -21,7 +21,15 @@
  
  	if ((extra = format_method_key(authctxt)) == NULL) {
  		if (authctxt->auth_method_info != NULL)
-@@ -599,7 +603,7 @@ getpwnamallow(struct ssh *ssh, const char *user)
+@@ -585,6 +589,7 @@ getpwnamallow(struct ssh *ssh, const char *user)
+ 	aix_restoreauthdb();
+ #endif
+ 	if (pw == NULL) {
++        BLACKLIST_NOTIFY(BLACKLIST_BAD_USER, user);
+ 		logit("Invalid user %.100s from %.100s port %d",
+ 		    user, ssh_remote_ipaddr(ssh), ssh_remote_port(ssh));
+ #ifdef CUSTOM_FAILED_LOGIN
+@@ -599,7 +604,7 @@ getpwnamallow(struct ssh *ssh, const char *user)
  	if (!allowed_user(ssh, pw))
  		return (NULL);
  #ifdef HAVE_LOGIN_CAP

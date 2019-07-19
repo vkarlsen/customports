@@ -1,4 +1,4 @@
---- servconf.c.orig	2019-07-19 20:11:34 UTC
+--- servconf.c.orig	2019-07-19 21:23:24 UTC
 +++ servconf.c
 @@ -41,6 +41,7 @@
  #include <util.h>

@@ -1,4 +1,4 @@
---- ssh_config.orig	2019-07-19 17:59:50 UTC
+--- ssh_config.orig	2019-07-19 21:23:24 UTC
 +++ ssh_config
 @@ -25,7 +25,7 @@
  #   GSSAPIAuthentication no
