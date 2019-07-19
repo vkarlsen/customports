@@ -1,17 +1,5 @@
-------------------------------------------------------------------------
-r99055 | des | 2002-06-29 04:21:58 -0700 (Sat, 29 Jun 2002) | 6 lines
-Changed paths:
-   M /head/crypto/openssh/session.c
-
-Make sure the environment variables set by setusercontext() are passed on
-to the child process.
-
-Reviewed by:    ache
-Sponsored by:   DARPA, NAI Labs
-
-
---- session.c.orig	2019-04-17 15:52:57.000000000 -0700
-+++ session.c	2019-07-02 16:15:23.270321000 -0700
+--- session.c.orig	2019-04-17 22:52:57 UTC
++++ session.c
 @@ -990,6 +990,9 @@ do_setup_env(struct ssh *ssh, Session *s, const char *
  	struct passwd *pw = s->pw;
  #if !defined (HAVE_LOGIN_CAP) && !defined (HAVE_CYGWIN)

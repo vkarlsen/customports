@@ -1,13 +1,6 @@
---- UTC
-r99053 | des | 2002-06-29 05:57:13 -0500 (Sat, 29 Jun 2002) | 4 lines
-Changed paths:
-   M /head/crypto/openssh/auth2.c
-
-Apply class-imposed login restrictions.
-
---- auth2.c.orig	2018-10-16 17:01:20.000000000 -0700
-+++ auth2.c	2018-11-10 11:35:07.816193000 -0800
-@@ -48,6 +48,7 @@
+--- auth2.c.orig	2019-04-17 22:52:57 UTC
++++ auth2.c
+@@ -49,10 +49,12 @@
  #include "sshkey.h"
  #include "hostfile.h"
  #include "auth.h"
@@ -15,9 +8,14 @@ Apply class-imposed login restrictions.
  #include "dispatch.h"
  #include "pathnames.h"
  #include "sshbuf.h"
-@@ -258,7 +259,14 @@ input_userauth_request(int type, u_int32_t seq, struct
- 	char *user, *service, *method, *style = NULL;
- 	int authenticated = 0;
+ #include "ssherr.h"
++#include "blacklist_client.h"
+ 
+ #ifdef GSSAPI
+ #include "ssh-gss.h"
+@@ -268,7 +270,14 @@ input_userauth_request(int type, u_int32_t seq, struct
+ 	char *user = NULL, *service = NULL, *method = NULL, *style = NULL;
+ 	int r, authenticated = 0;
  	double tstart = monotime_double();
 +#ifdef HAVE_LOGIN_CAP
 +	login_cap_t *lc;
@@ -30,8 +28,8 @@ Apply class-imposed login restrictions.
  	if (authctxt == NULL)
  		fatal("input_userauth_request: no authctxt");
  
-@@ -307,6 +315,27 @@ input_userauth_request(int type, u_int32_t seq, struct
- 		    "(%s,%s) -> (%s,%s)",
+@@ -319,6 +328,27 @@ input_userauth_request(int type, u_int32_t seq, struct
+ 		    "not allowed: (%s,%s) -> (%s,%s)",
  		    authctxt->user, authctxt->service, user, service);
  	}
 +
@@ -58,3 +56,15 @@ Apply class-imposed login restrictions.
  	/* reset state */
  	auth2_challenge_stop(ssh);
  
+@@ -426,8 +456,10 @@ userauth_finish(struct ssh *ssh, int authenticated, co
+ 	} else {
+ 		/* Allow initial try of "none" auth without failure penalty */
+ 		if (!partial && !authctxt->server_caused_failure &&
+-		    (authctxt->attempt > 1 || strcmp(method, "none") != 0))
++		    (authctxt->attempt > 1 || strcmp(method, "none") != 0)) {
+ 			authctxt->failures++;
++            BLACKLIST_NOTIFY(BLACKLIST_AUTH_FAIL, "ssh");
++        }
+ 		if (authctxt->failures >= options.max_authtries) {
+ #ifdef SSH_AUDIT_EVENTS
+ 			PRIVSEP(audit_event(ssh, SSH_LOGIN_EXCEED_MAXTRIES));

@@ -1,13 +1,5 @@
-r99048 | des | 2002-06-29 05:51:56 -0500 (Sat, 29 Jun 2002) | 4 lines
-Changed paths:
-   M /head/crypto/openssh/myproposal.h
-   M /head/crypto/openssh/readconf.c
-   M /head/crypto/openssh/servconf.c
-
-Apply FreeBSD's configuration defaults.
-
---- servconf.c.orig	2018-06-27 17:18:19.513676000 -0700
-+++ servconf.c	2018-06-27 17:19:38.133882000 -0700
+--- servconf.c.orig	2019-07-19 17:59:51 UTC
++++ servconf.c
 @@ -41,6 +41,7 @@
  #include <util.h>
  #endif
@@ -16,7 +8,15 @@ Apply FreeBSD's configuration defaults.
  #include "openbsd-compat/sys-queue.h"
  #include "xmalloc.h"
  #include "ssh.h"
-@@ -251,7 +252,11 @@ fill_default_server_options(ServerOptions *options)
+@@ -180,6 +181,7 @@ initialize_server_options(ServerOptions *options)
+ 	options->fingerprint_hash = -1;
+ 	options->disable_forwarding = -1;
+ 	options->expose_userauth_info = -1;
++    options->use_blacklist = -1;
+ }
+ 
+ /* Returns 1 if a string option is unset or set to "none" or 0 otherwise. */
+@@ -276,7 +278,11 @@ fill_default_server_options(ServerOptions *options)
  
  	/* Portable-specific options */
  	if (options->use_pam == -1)
@@ -28,7 +28,7 @@ Apply FreeBSD's configuration defaults.
  
  	/* Standard Options */
  	if (options->num_host_key_files == 0) {
-@@ -291,7 +296,7 @@ fill_default_server_options(ServerOptions *options)
+@@ -316,7 +322,7 @@ fill_default_server_options(ServerOptions *options)
  	if (options->print_lastlog == -1)
  		options->print_lastlog = 1;
  	if (options->x11_forwarding == -1)
@@ -37,7 +37,7 @@ Apply FreeBSD's configuration defaults.
  	if (options->x11_display_offset == -1)
  		options->x11_display_offset = 10;
  	if (options->x11_use_localhost == -1)
-@@ -331,7 +336,11 @@ fill_default_server_options(ServerOptions *options)
+@@ -356,7 +362,11 @@ fill_default_server_options(ServerOptions *options)
  	if (options->gss_strict_acceptor == -1)
  		options->gss_strict_acceptor = 1;
  	if (options->password_authentication == -1)
@@ -49,3 +49,39 @@ Apply FreeBSD's configuration defaults.
  	if (options->kbd_interactive_authentication == -1)
  		options->kbd_interactive_authentication = 0;
  	if (options->challenge_response_authentication == -1)
+@@ -425,6 +435,8 @@ fill_default_server_options(ServerOptions *options)
+ 		options->disable_forwarding = 0;
+ 	if (options->expose_userauth_info == -1)
+ 		options->expose_userauth_info = 0;
++    if (options->use_blacklist == -1)
++        options->use_blacklist = 0;
+ 
+ 	assemble_algorithms(options);
+ 
+@@ -510,6 +522,7 @@ typedef enum {
+ 	sStreamLocalBindMask, sStreamLocalBindUnlink,
+ 	sAllowStreamLocalForwarding, sFingerprintHash, sDisableForwarding,
+ 	sExposeAuthInfo, sRDomain,
++    sUseBlacklist,
+ 	sDeprecated, sIgnore, sUnsupported
+ } ServerOpCodes;
+ 
+@@ -2157,6 +2170,10 @@ process_server_config_line(ServerOptions *options, cha
+ 		intptr = &options->expose_userauth_info;
+ 		goto parse_flag;
+ 
++    case sUseBlacklist:
++        intptr = &options->use_blacklist;
++        goto parse_flag;
++
+ 	case sRDomain:
+ 		charptr = &options->routing_domain;
+ 		arg = strdelim(&cp);
+@@ -2610,6 +2627,7 @@ dump_config(ServerOptions *o)
+ 	dump_cfg_fmtint(sStreamLocalBindUnlink, o->fwd_opts.streamlocal_bind_unlink);
+ 	dump_cfg_fmtint(sFingerprintHash, o->fingerprint_hash);
+ 	dump_cfg_fmtint(sExposeAuthInfo, o->expose_userauth_info);
++    dump_cfg_fmtint(sUseBlacklist, o->use_blacklist);
+ 
+ 	/* string arguments */
+ 	dump_cfg_string(sPidFile, o->pid_file);

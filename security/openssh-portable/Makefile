@@ -43,8 +43,8 @@ gssapi_BROKEN=		GSSAPI not yet updated for ${DISTVERSION}
 x509_BROKEN=		X509 not yet updated for ${DISTVERSION} - Does anyone use this? Contact maintainer bdrewery@FreeBSD.org
 OPTIONS_DEFINE=		DOCS PAM TCP_WRAPPERS LIBEDIT BSM \
 			HPN X509 KERB_GSSAPI \
-			LDNS NONECIPHER XMSS BLACKLISTD
-OPTIONS_DEFAULT=	LIBEDIT PAM TCP_WRAPPERS LDNS BLACKLISTD
+			LDNS NONECIPHER XMSS
+OPTIONS_DEFAULT=	LIBEDIT PAM TCP_WRAPPERS LDNS
 .if ${FLAVOR:U} == hpn
 OPTIONS_DEFAULT+=	HPN NONECIPHER
 .endif
@@ -67,7 +67,6 @@ HEIMDAL_BASE_DESC=	Heimdal Kerberos (base)
 MIT_DESC=		MIT Kerberos (security/krb5)
 NONECIPHER_DESC=	NONE Cipher support
 XMSS_DESC=		XMSS key support (experimental)
-BLACKLISTD_DESC=	FreeBSD blacklistd support
 
 OPTIONS_SUB=		yes
 
@@ -97,8 +96,6 @@ TCP_WRAPPERS_CONFIGURE_WITH=	tcp-wrappers
 LIBEDIT_CONFIGURE_WITH=	libedit
 LIBEDIT_USES=		libedit
 BSM_CONFIGURE_ON=	--with-audit=bsm
-
-BLACKLISTD_EXTRA_PATCHES=	${FILESDIR}/extra-patch-blacklistd
 
 ETCDIR?=		${PREFIX}/etc/ssh
 

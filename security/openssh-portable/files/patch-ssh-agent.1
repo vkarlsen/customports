@@ -1,11 +1,5 @@
---- UTC
-r226103 | des | 2011-10-07 08:10:16 -0500 (Fri, 07 Oct 2011) | 5 lines
-
-Add a -x option that causes ssh-agent(1) to exit when all clients have
-disconnected.
-
---- ssh-agent.1.orig	2015-05-29 03:27:21.000000000 -0500
-+++ ssh-agent.1	2015-06-02 09:45:37.025390000 -0500
+--- ssh-agent.1.orig	2019-04-17 22:52:57 UTC
++++ ssh-agent.1
 @@ -43,7 +43,7 @@
  .Sh SYNOPSIS
  .Nm ssh-agent
@@ -14,8 +8,8 @@ disconnected.
 +.Op Fl \&Ddx
  .Op Fl a Ar bind_address
  .Op Fl E Ar fingerprint_hash
- .Op Fl t Ar life
-@@ -128,6 +128,8 @@
+ .Op Fl P Ar pkcs11_whitelist
+@@ -148,6 +148,8 @@ A lifetime specified for an identity with
  .Xr ssh-add 1
  overrides this value.
  Without this option the default maximum lifetime is forever.
@@ -23,4 +17,4 @@ disconnected.
 +Exit after the last client has disconnected.
  .El
  .Pp
- If a commandline is given, this is executed as a subprocess of the agent.
+ If a command line is given, this is executed as a subprocess of the agent.

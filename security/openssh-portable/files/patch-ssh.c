@@ -1,13 +1,6 @@
---- UTC
-r99054 | des | 2002-06-29 05:57:53 -0500 (Sat, 29 Jun 2002) | 4 lines
-Changed paths:
-   M /head/crypto/openssh/ssh.c
-
-Canonicize the host name before looking it up in the host file.
-
---- ssh.c.orig	2018-04-02 05:38:28 UTC
+--- ssh.c.orig	2019-04-17 22:52:57 UTC
 +++ ssh.c
-@@ -1281,6 +1281,23 @@ main(int ac, char **av)
+@@ -1291,6 +1291,23 @@ main(int ac, char **av)
  	ssh_digest_free(md);
  	conn_hash_hex = tohex(conn_hash, ssh_digest_bytes(SSH_DIGEST_SHA1));
  
