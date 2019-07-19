@@ -1,4 +1,4 @@
---- servconf.c.orig	2019-07-19 17:59:51 UTC
+--- servconf.c.orig	2019-07-19 20:11:34 UTC
 +++ servconf.c
 @@ -41,6 +41,7 @@
  #include <util.h>
@@ -66,7 +66,15 @@
  	sDeprecated, sIgnore, sUnsupported
  } ServerOpCodes;
  
-@@ -2157,6 +2170,10 @@ process_server_config_line(ServerOptions *options, cha
+@@ -621,6 +634,7 @@ static struct {
+ 	{ "maxsessions", sMaxSessions, SSHCFG_ALL },
+ 	{ "banner", sBanner, SSHCFG_ALL },
+ 	{ "usedns", sUseDNS, SSHCFG_GLOBAL },
++    { "useblacklist", sUseBlacklist, SSHCFG_GLOBAL },
+ 	{ "verifyreversemapping", sDeprecated, SSHCFG_GLOBAL },
+ 	{ "reversemappingcheck", sDeprecated, SSHCFG_GLOBAL },
+ 	{ "clientaliveinterval", sClientAliveInterval, SSHCFG_ALL },
+@@ -2157,6 +2171,10 @@ process_server_config_line(ServerOptions *options, cha
  		intptr = &options->expose_userauth_info;
  		goto parse_flag;
  
@@ -77,7 +85,7 @@
  	case sRDomain:
  		charptr = &options->routing_domain;
  		arg = strdelim(&cp);
-@@ -2610,6 +2627,7 @@ dump_config(ServerOptions *o)
+@@ -2610,6 +2628,7 @@ dump_config(ServerOptions *o)
  	dump_cfg_fmtint(sStreamLocalBindUnlink, o->fwd_opts.streamlocal_bind_unlink);
  	dump_cfg_fmtint(sFingerprintHash, o->fingerprint_hash);
  	dump_cfg_fmtint(sExposeAuthInfo, o->expose_userauth_info);
