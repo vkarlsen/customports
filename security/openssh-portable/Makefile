@@ -1,9 +1,9 @@
 # Created by: dwcjr@inethouston.net
-# $FreeBSD: head/security/openssh-portable/Makefile 506878 2019-07-18 20:10:06Z bdrewery $
+# $FreeBSD: head/security/openssh-portable/Makefile 506959 2019-07-19 19:18:09Z bdrewery $
 
 PORTNAME=	openssh
 DISTVERSION=	8.0p1
-PORTREVISION=	1
+PORTREVISION=	0
 PORTEPOCH=	1
 CATEGORIES=	security ipv6
 MASTER_SITES=	OPENBSD/OpenSSH/portable
@@ -39,11 +39,10 @@ x509_CONFLICTS_INSTALL=		openssh-portable openssh-portable-hpn \
 				openssh-portable-gssapi
 x509_PKGNAMESUFFIX=		-portable-x509
 
-gssapi_BROKEN=		GSSAPI not yet updated for ${DISTVERSION}
 x509_BROKEN=		X509 not yet updated for ${DISTVERSION} - Does anyone use this? Contact maintainer bdrewery@FreeBSD.org
 OPTIONS_DEFINE=		DOCS PAM TCP_WRAPPERS LIBEDIT BSM \
 			HPN X509 KERB_GSSAPI \
-			LDNS NONECIPHER XMSS
+			LDNS NONECIPHER XMSS BLACKLISTD
 OPTIONS_DEFAULT=	LIBEDIT PAM TCP_WRAPPERS LDNS
 .if ${FLAVOR:U} == hpn
 OPTIONS_DEFAULT+=	HPN NONECIPHER
@@ -54,6 +53,7 @@ OPTIONS_DEFAULT+=	KERB_GSSAPI MIT
 .if ${FLAVOR:U} == x509
 OPTIONS_DEFAULT+=	X509
 .endif
+OPTIONS_DEFAULT+=	BLACKLISTD
 OPTIONS_RADIO=		KERBEROS
 OPTIONS_RADIO_KERBEROS=	MIT HEIMDAL HEIMDAL_BASE
 TCP_WRAPPERS_DESC=	tcp_wrappers support
@@ -67,8 +67,24 @@ HEIMDAL_BASE_DESC=	Heimdal Kerberos (base)
 MIT_DESC=		MIT Kerberos (security/krb5)
 NONECIPHER_DESC=	NONE Cipher support
 XMSS_DESC=		XMSS key support (experimental)
+BLACKLISTD_DESC=	Blacklistd(8) support
 
 OPTIONS_SUB=		yes
+
+#BLACKLISTD_CONFIGURE_ON=	--with-ldflags='-L${WRKSRC}/contrib/blacklist/lib -L/usr/lib' --with-libs='-lblacklist'
+#BLACKLISTD_CONFIGURE_ON=	--with-ldflags='-L/usr/lib' # --with-libs='-lblacklist'
+#BLACKLISTD_MAKE_ARGS=		USE_LIBBLACKLIST=yes
+#BLACKLISTD_CONFIGURE_ENV=	LIBS="-L/usr/lib -lblacklist"
+#BLACKLISTD_CFLAGS=		-DUSE_BLACKLIST -I${WRKSRC}/contrib/blacklist/include -I/usr/include
+BLACKLISTD_CFLAGS=		-DUSE_BLACKLIST=1 -I/usr/include # -I${WRKSRC}/contrib/blacklist/include
+BLACKLISTD_CPPFLAGS=		-DUSE_BLACKLIST=1 -I/usr/include
+BLACKLISTD_LIBS=		-lblacklist
+BLACKLISTD_CONFIGURE_LIBS=	-lblacklist
+#BLACKLISTD_LDFLAGS=		-L${WRKSRC}/contrib/blacklist/lib -L/usr/lib
+#BLACKLISTD_LDFLAGS=		-L/usr/lib -I${WRKSRC}/contrib/blacklist/include
+BLACKLISTD_LDFLAGS=		-L/usr/lib -I/usr/include
+#BLACKLISTD_SRCS=		blacklist.c
+BLACKLISTD_EXTRA_PATCHES=	${FILESDIR}/extra-patch-blacklistd
 
 TCP_WRAPPERS_EXTRA_PATCHES=${FILESDIR}/extra-patch-tcpwrappers
 
@@ -97,11 +113,13 @@ LIBEDIT_CONFIGURE_WITH=	libedit
 LIBEDIT_USES=		libedit
 BSM_CONFIGURE_ON=	--with-audit=bsm
 
+BLACKLISTD_EXTRA_PATCHES=	${FILESDIR}/extra-patch-blacklistd
+
 ETCDIR?=		${PREFIX}/etc/ssh
 
 .include <bsd.port.pre.mk>
 
-PATCH_SITES+=		http://mirror.shatow.net/freebsd/${PORTNAME}/:DEFAULT,x509,hpn,gsskex
+PATCH_SITES+=	http://mirror.shatow.net/freebsd/${PORTNAME}/:DEFAULT,x509,hpn,gsskex
 
 # X509 patch includes TCP Wrapper support already
 .if ${PORT_OPTIONS:MX509}
@@ -111,16 +129,19 @@ EXTRA_PATCHES:=		${EXTRA_PATCHES:N${TCP_WRAPPERS_EXTRA_PATCHES}}
 # Must add this patch before HPN due to conflicts
 .if ${PORT_OPTIONS:MKERB_GSSAPI}
 #BROKEN=	KERB_GSSAPI No patch for ${DISTVERSION} yet.
-# Patch from:
-# https://sources.debian.org/data/main/o/openssh/1:7.7p1-2/debian/patches/gssapi.patch
-# which was originally based on 5.7 patch from
-# http://www.sxw.org.uk/computing/patches/
-# It is mirrored simply to apply gzip -9.
 .  if ${PORT_OPTIONS:MHPN} || ${PORT_OPTIONS:MNONECIPHER}
 # Needed glue for applying HPN patch without conflict
 EXTRA_PATCHES+=	${FILESDIR}/extra-patch-hpn-gss-glue
 .  endif
-PATCHFILES+=	openssh-7.9p1-gsskex-all-20141021-debian-rh-20181020.patch.gz:-p1:gsskex
+# - See https://sources.debian.org/data/main/o/openssh/ for which subdir to
+# pull from.
+GSSAPI_DEBIAN_SUBDIR=	${DISTVERSION}-3
+# - Debian does not use a versioned filename so we trick fetch to make one for
+# us with the ?<anything>=/ trick.
+PATCH_SITES+=	https://sources.debian.org/data/main/o/openssh/1:${GSSAPI_DEBIAN_SUBDIR}/debian/patches/gssapi.patch?dummy=/:gsskex
+# Bump this when updating the patch location
+GSSAPI_UPDATE_DATE=	20190719
+PATCHFILES+=	openssh-${DISTVERSION}-gsskex-all-20141021-debian-rh-${GSSAPI_UPDATE_DATE}.patch:-p1:gsskex
 .endif
 
 # https://www.psc.edu/hpn-ssh https://github.com/rapier1/openssh-portable/tree/hpn-openssl1.1-7_7_P1

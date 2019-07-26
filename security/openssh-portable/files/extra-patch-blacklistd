@@ -1,0 +1,397 @@
+--- Makefile.in.orig	2019-07-25 16:51:09 UTC
++++ Makefile.in
+@@ -104,7 +104,7 @@ LIBSSH_OBJS=${LIBOPENSSH_OBJS} \
+ 
+ 
+ SSHOBJS= ssh.o readconf.o clientloop.o sshtty.o \
+-	sshconnect.o sshconnect2.o mux.o
++	sshconnect.o sshconnect2.o mux.o blacklist.o
+ 
+ SSHDOBJS=sshd.o auth-rhosts.o auth-passwd.o \
+ 	audit.o audit-bsm.o audit-linux.o platform.o \
+@@ -119,7 +119,7 @@ SSHDOBJS=sshd.o auth-rhosts.o auth-passwd.o \
+ 	sftp-server.o sftp-common.o \
+ 	sandbox-null.o sandbox-rlimit.o sandbox-systrace.o sandbox-darwin.o \
+ 	sandbox-seccomp-filter.o sandbox-capsicum.o sandbox-pledge.o \
+-	sandbox-solaris.o uidswap.o
++	sandbox-solaris.o uidswap.o blacklist.o
+ 
+ MANPAGES	= moduli.5.out scp.1.out ssh-add.1.out ssh-agent.1.out ssh-keygen.1.out ssh-keyscan.1.out ssh.1.out sshd.8.out sftp-server.8.out sftp.1.out ssh-keysign.8.out ssh-pkcs11-helper.8.out sshd_config.5.out ssh_config.5.out
+ MANPAGES_IN	= moduli.5 scp.1 ssh-add.1 ssh-agent.1 ssh-keygen.1 ssh-keyscan.1 ssh.1 sshd.8 sftp-server.8 sftp.1 ssh-keysign.8 ssh-pkcs11-helper.8 sshd_config.5 ssh_config.5
+@@ -193,8 +193,8 @@ ssh-keysign$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-keysig
+ ssh-pkcs11-helper$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-pkcs11-helper.o ssh-pkcs11.o
+ 	$(LD) -o $@ ssh-pkcs11-helper.o ssh-pkcs11.o $(LDFLAGS) -lssh -lopenbsd-compat -lssh -lopenbsd-compat $(LIBS)
+ 
+-ssh-keyscan$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-keyscan.o
+-	$(LD) -o $@ ssh-keyscan.o $(LDFLAGS) -lssh -lopenbsd-compat -lssh $(LIBS)
++ssh-keyscan$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-keyscan.o blacklist.o
++	$(LD) -o $@ ssh-keyscan.o $(LDFLAGS) -lssh -lopenbsd-compat -lssh $(LIBS) blacklist.o
+ 
+ sftp-server$(EXEEXT): $(LIBCOMPAT) libssh.a sftp.o sftp-common.o sftp-server.o sftp-server-main.o
+ 	$(LD) -o $@ sftp-server.o sftp-common.o sftp-server-main.o $(LDFLAGS) -lssh -lopenbsd-compat $(LIBS)
+--- auth-pam.c.orig	2019-07-25 16:58:32 UTC
++++ auth-pam.c
+@@ -103,6 +103,7 @@ extern char *__progname;
+ #include "ssh-gss.h"
+ #endif
+ #include "monitor_wrap.h"
++#include "blacklist_client.h"
+ 
+ extern ServerOptions options;
+ extern struct sshbuf *loginmsg;
+@@ -900,6 +901,7 @@ sshpam_query(void *ctx, char **name, char **info,
+ 				free(msg);
+ 				return (0);
+ 			}
++            BLACKLIST_NOTIFY(BLACKLIST_AUTH_FAIL);
+ 			error("PAM: %s for %s%.100s from %.100s", msg,
+ 			    sshpam_authctxt->valid ? "" : "illegal user ",
+ 			    sshpam_authctxt->user, sshpam_rhost);
+--- auth.c.orig	2019-07-25 16:58:39 UTC
++++ auth.c
+@@ -76,6 +76,7 @@
+ #include "ssherr.h"
+ #include "compat.h"
+ #include "channels.h"
++#include "blacklist_client.h"
+ 
+ /* import */
+ extern ServerOptions options;
+@@ -330,8 +331,11 @@ auth_log(struct ssh *ssh, int authenticated, int parti
+ 		authmsg = "Postponed";
+ 	else if (partial)
+ 		authmsg = "Partial";
+-	else
++	else {
+ 		authmsg = authenticated ? "Accepted" : "Failed";
++        BLACKLIST_NOTIFY(authenticated ?
++                BLACKLIST_AUTH_OK : BLACKLIST_AUTH_FAIL);
++    }
+ 
+ 	if ((extra = format_method_key(authctxt)) == NULL) {
+ 		if (authctxt->auth_method_info != NULL)
+@@ -585,6 +589,7 @@ getpwnamallow(struct ssh *ssh, const char *user)
+ 	aix_restoreauthdb();
+ #endif
+ 	if (pw == NULL) {
++        BLACKLIST_NOTIFY(BLACKLIST_AUTH_FAIL);
+ 		logit("Invalid user %.100s from %.100s port %d",
+ 		    user, ssh_remote_ipaddr(ssh), ssh_remote_port(ssh));
+ #ifdef CUSTOM_FAILED_LOGIN
+--- auth2.c.orig	2019-07-25 16:58:59 UTC
++++ auth2.c
+@@ -54,6 +54,7 @@
+ #include "pathnames.h"
+ #include "sshbuf.h"
+ #include "ssherr.h"
++#include "blacklist_client.h"
+ 
+ #ifdef GSSAPI
+ #include "ssh-gss.h"
+@@ -301,6 +302,7 @@ input_userauth_request(int type, u_int32_t seq, struct
+ 		} else {
+ 			/* Invalid user, fake password information */
+ 			authctxt->pw = fakepw();
++            BLACKLIST_NOTIFY(BLACKLIST_AUTH_FAIL);
+ #ifdef SSH_AUDIT_EVENTS
+ 			PRIVSEP(audit_event(ssh, SSH_INVALID_USER));
+ #endif
+--- blacklist.c.orig	2019-07-25 16:59:41 UTC
++++ blacklist.c
+@@ -0,0 +1,97 @@
++/*-
++ * Copyright (c) 2015 The NetBSD Foundation, Inc.
++ * Copyright (c) 2016 The FreeBSD Foundation, Inc.
++ * All rights reserved.
++ *
++ * Portions of this software were developed by Kurt Lidl
++ * under sponsorship from the FreeBSD Foundation.
++ *
++ * This code is derived from software contributed to The NetBSD Foundation
++ * by Christos Zoulas.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
++ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
++ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
++ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include "includes.h"
++
++#include <ctype.h>
++#include <stdarg.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <syslog.h>
++#include <unistd.h>
++
++#include "ssh.h"
++#include "packet.h"
++#include "log.h"
++#include "misc.h"
++#include "servconf.h"
++#include <blacklist.h>
++#include "blacklist_client.h"
++
++static struct blacklist *blstate = NULL;
++
++/* import */
++extern ServerOptions options;
++
++/* internal definition from bl.h */
++struct blacklist *bl_create(bool, char *, void (*)(int, const char *, va_list));
++
++/* impedence match vsyslog() to sshd's internal logging levels */
++void
++im_log(int priority, const char *message, va_list args)
++{
++	LogLevel imlevel;
++
++	switch (priority) {
++	case LOG_ERR:
++		imlevel = SYSLOG_LEVEL_ERROR;
++		break;
++	case LOG_DEBUG:
++		imlevel = SYSLOG_LEVEL_DEBUG1;
++		break;
++	case LOG_INFO:
++		imlevel = SYSLOG_LEVEL_INFO;
++		break;
++	default:
++		imlevel = SYSLOG_LEVEL_DEBUG2;
++	}
++	do_log(imlevel, message, args);
++}
++
++void
++blacklist_init(void)
++{
++
++	if (options.use_blacklist)
++		blstate = bl_create(false, NULL, im_log);
++}
++
++void
++blacklist_notify(int action)
++{
++
++	if (blstate != NULL && ssh_packet_connection_is_on_socket(action))
++		(void)blacklist_r(blstate, action,
++		ssh_packet_get_connection_in(action), "ssh");
++}
+--- blacklist_client.h.orig	2019-07-25 17:00:41 UTC
++++ blacklist_client.h
+@@ -0,0 +1,59 @@
++/*-
++ * Copyright (c) 2015 The NetBSD Foundation, Inc.
++ * Copyright (c) 2016 The FreeBSD Foundation, Inc.
++ * All rights reserved.
++ *
++ * Portions of this software were developed by Kurt Lidl
++ * under sponsorship from the FreeBSD Foundation.
++ *
++ * This code is derived from software contributed to The NetBSD Foundation
++ * by Christos Zoulas.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
++ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
++ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
++ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
++ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
++ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
++ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
++ * POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#ifndef BLACKLIST_CLIENT_H
++#define BLACKLIST_CLIENT_H
++
++#ifndef BLACKLIST_API_ENUM
++enum {
++	BLACKLIST_AUTH_OK = 0,
++	BLACKLIST_AUTH_FAIL
++};
++#endif
++
++#ifdef USE_BLACKLIST
++void blacklist_init(void);
++void blacklist_notify(int);
++
++#define BLACKLIST_INIT() blacklist_init()
++#define BLACKLIST_NOTIFY(x) blacklist_notify(x)
++
++#else
++
++#define BLACKLIST_INIT()
++#define BLACKLIST_NOTIFY(x)
++
++#endif
++
++
++#endif /* BLACKLIST_CLIENT_H */
+--- packet.c.orig	2019-07-25 17:00:53 UTC
++++ packet.c
+@@ -93,6 +93,7 @@
+ #include "packet.h"
+ #include "ssherr.h"
+ #include "sshbuf.h"
++#include "blacklist_client.h"
+ 
+ #ifdef PACKET_DEBUG
+ #define DBG(x) x
+@@ -1842,6 +1843,7 @@ sshpkt_vfatal(struct ssh *ssh, int r, const char *fmt,
+ 	case SSH_ERR_NO_HOSTKEY_ALG_MATCH:
+ 		if (ssh && ssh->kex && ssh->kex->failed_choice) {
+ 			ssh_packet_clear_keys(ssh);
++            BLACKLIST_NOTIFY(BLACKLIST_AUTH_FAIL);
+ 			logdie("Unable to negotiate with %s: %s. "
+ 			    "Their offer: %s", remote_id, ssh_err(r),
+ 			    ssh->kex->failed_choice);
+--- servconf.c.orig	2019-07-25 18:47:18 UTC
++++ servconf.c
+@@ -181,6 +181,7 @@ initialize_server_options(ServerOptions *options)
+ 	options->fingerprint_hash = -1;
+ 	options->disable_forwarding = -1;
+ 	options->expose_userauth_info = -1;
++    options->use_blacklist = -1;
+ }
+ 
+ /* Returns 1 if a string option is unset or set to "none" or 0 otherwise. */
+@@ -434,6 +435,8 @@ fill_default_server_options(ServerOptions *options)
+ 		options->disable_forwarding = 0;
+ 	if (options->expose_userauth_info == -1)
+ 		options->expose_userauth_info = 0;
++    if (options->use_blacklist == -1)
++        options->use_blacklist = 0;
+ 
+ 	assemble_algorithms(options);
+ 
+@@ -519,6 +522,7 @@ typedef enum {
+ 	sStreamLocalBindMask, sStreamLocalBindUnlink,
+ 	sAllowStreamLocalForwarding, sFingerprintHash, sDisableForwarding,
+ 	sExposeAuthInfo, sRDomain,
++    sUseBlacklist,
+ 	sDeprecated, sIgnore, sUnsupported
+ } ServerOpCodes;
+ 
+@@ -639,6 +643,7 @@ static struct {
+ 	{ "useprivilegeseparation", sDeprecated, SSHCFG_GLOBAL},
+ 	{ "acceptenv", sAcceptEnv, SSHCFG_ALL },
+ 	{ "setenv", sSetEnv, SSHCFG_ALL },
++	{ "useblacklist", sUseBlacklist, SSHCFG_GLOBAL },
+ 	{ "permittunnel", sPermitTunnel, SSHCFG_ALL },
+ 	{ "permittty", sPermitTTY, SSHCFG_ALL },
+ 	{ "permituserrc", sPermitUserRC, SSHCFG_ALL },
+@@ -2176,6 +2181,10 @@ process_server_config_line(ServerOptions *options, cha
+ 			*charptr = xstrdup(arg);
+ 		break;
+ 
++    case sUseBlacklist:
++        intptr = &options->use_blacklist;
++        goto parse_flag;
++
+ 	case sDeprecated:
+ 	case sIgnore:
+ 	case sUnsupported:
+@@ -2615,6 +2624,7 @@ dump_config(ServerOptions *o)
+ 	dump_cfg_fmtint(sStreamLocalBindUnlink, o->fwd_opts.streamlocal_bind_unlink);
+ 	dump_cfg_fmtint(sFingerprintHash, o->fingerprint_hash);
+ 	dump_cfg_fmtint(sExposeAuthInfo, o->expose_userauth_info);
++    dump_cfg_fmtint(sUseBlacklist, o->use_blacklist);
+ 
+ 	/* string arguments */
+ 	dump_cfg_string(sPidFile, o->pid_file);
+--- servconf.h.orig	2019-07-25 17:01:11 UTC
++++ servconf.h
+@@ -210,6 +210,7 @@ typedef struct {
+ 
+ 	int	fingerprint_hash;
+ 	int	expose_userauth_info;
++    int	use_blacklist;
+ 	u_int64_t timing_secret;
+ }       ServerOptions;
+ 
+--- sshd.c.orig	2019-07-25 17:01:26 UTC
++++ sshd.c
+@@ -130,6 +130,8 @@
+ #include "auth-options.h"
+ #include "version.h"
+ #include "ssherr.h"
++#include <blacklist.h>
++#include "blacklist_client.h"
+ 
+ #ifdef LIBWRAP
+ #include <tcpd.h>
+@@ -384,6 +386,8 @@ grace_alarm_handler(int sig)
+ 		kill(0, SIGTERM);
+ 	}
+ 
++    BLACKLIST_NOTIFY(BLACKLIST_AUTH_FAIL);
++
+ 	/* XXX pre-format ipaddr/port so we don't need to access active_state */
+ 	/* Log error and exit. */
+ 	sigdie("Timeout before authentication for %s port %d",
+@@ -2159,6 +2163,8 @@ main(int ac, char **av)
+ 	if ((loginmsg = sshbuf_new()) == NULL)
+ 		fatal("%s: sshbuf_new failed", __func__);
+ 	auth_debug_reset();
++
++    BLACKLIST_INIT();
+ 
+ 	if (use_privsep) {
+ 		if (privsep_preauth(ssh) == 1)
+--- sshd_config.orig	2019-07-25 18:48:32 UTC
++++ sshd_config
+@@ -116,3 +116,5 @@ Subsystem	sftp	/usr/libexec/sftp-server
+ #	AllowTcpForwarding no
+ #	PermitTTY no
+ #	ForceCommand cvs server
++
++#UseBlacklist no
+--- sshd_config.5.orig	2019-07-25 17:01:39 UTC
++++ sshd_config.5
+@@ -1609,6 +1609,15 @@ for authentication using
+ .Cm TrustedUserCAKeys .
+ For more details on certificates, see the CERTIFICATES section in
+ .Xr ssh-keygen 1 .
++.It Cm UseBlacklist
++Specifies whether
++.Xr sshd 8
++attempts to send authentication success and failure messages
++to the
++.Xr blacklistd 8
++daemon.
++The default is
++.Dq no .
+ .It Cm UseDNS
+ Specifies whether
+ .Xr sshd 8

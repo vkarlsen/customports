@@ -1,6 +1,16 @@
---- ssh-agent.c.orig	2019-04-17 22:52:57 UTC
-+++ ssh-agent.c
-@@ -164,15 +164,34 @@ static long lifetime = 0;
+--- UTC
+r110506 | des | 2003-02-07 09:48:27 -0600 (Fri, 07 Feb 2003) | 4 lines
+
+Set the ruid to the euid at startup as a workaround for a bug in pam_ssh.
+
+r226103 | des | 2011-10-07 08:10:16 -0500 (Fri, 07 Oct 2011) | 5 lines
+
+Add a -x option that causes ssh-agent(1) to exit when all clients have
+disconnected.
+
+--- ssh-agent.c.orig	2017-10-02 12:34:26.000000000 -0700
++++ ssh-agent.c	2017-10-12 11:31:40.908737000 -0700
+@@ -162,15 +162,34 @@ static long lifetime = 0;
  
  static int fingerprint_hash = SSH_FP_HASH_DEFAULT;
  
@@ -35,7 +45,7 @@
  }
  
  static void
-@@ -775,6 +794,10 @@ new_socket(sock_type type, int fd)
+@@ -745,6 +764,10 @@ new_socket(sock_type type, int fd)
  {
  	u_int i, old_alloc, new_alloc;
  
@@ -46,7 +56,7 @@
  	set_nonblock(fd);
  
  	if (fd > max_fd)
-@@ -1070,7 +1093,7 @@ static void
+@@ -1007,7 +1030,7 @@ static void
  usage(void)
  {
  	fprintf(stderr,
@@ -55,7 +65,7 @@
  	    "                 [-P pkcs11_whitelist] [-t life] [command [arg ...]]\n"
  	    "       ssh-agent [-c | -s] -k\n");
  	exit(1);
-@@ -1103,6 +1126,7 @@ main(int ac, char **av)
+@@ -1039,6 +1062,7 @@ main(int ac, char **av)
  	/* drop */
  	setegid(getgid());
  	setgid(getgid());
@@ -63,7 +73,7 @@
  
  	platform_disable_tracing(0);	/* strict=no */
  
-@@ -1112,7 +1136,7 @@ main(int ac, char **av)
+@@ -1049,7 +1073,7 @@ main(int ac, char **av)
  	__progname = ssh_get_progname(av[0]);
  	seed_rng();
  
@@ -72,7 +82,7 @@
  		switch (ch) {
  		case 'E':
  			fingerprint_hash = ssh_digest_alg_by_name(optarg);
-@@ -1155,6 +1179,9 @@ main(int ac, char **av)
+@@ -1092,6 +1116,9 @@ main(int ac, char **av)
  				fprintf(stderr, "Invalid lifetime\n");
  				usage();
  			}

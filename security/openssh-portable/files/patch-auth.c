@@ -1,36 +1,17 @@
---- auth.c.orig	2019-04-17 22:52:57 UTC
-+++ auth.c
-@@ -75,6 +75,7 @@
- #include "authfile.h"
- #include "ssherr.h"
- #include "compat.h"
-+#include "blacklist_client.h"
- #include "channels.h"
- 
- /* import */
-@@ -330,8 +331,11 @@ auth_log(struct ssh *ssh, int authenticated, int parti
- 		authmsg = "Postponed";
- 	else if (partial)
- 		authmsg = "Partial";
--	else
-+	else {
- 		authmsg = authenticated ? "Accepted" : "Failed";
-+        if (authenticated)
-+            BLACKLIST_NOTIFY(BLACKLIST_AUTH_OK, "ssh");
-+    }
- 
- 	if ((extra = format_method_key(authctxt)) == NULL) {
- 		if (authctxt->auth_method_info != NULL)
-@@ -585,6 +589,7 @@ getpwnamallow(struct ssh *ssh, const char *user)
- 	aix_restoreauthdb();
- #endif
- 	if (pw == NULL) {
-+        BLACKLIST_NOTIFY(BLACKLIST_BAD_USER, user);
- 		logit("Invalid user %.100s from %.100s port %d",
- 		    user, ssh_remote_ipaddr(ssh), ssh_remote_port(ssh));
- #ifdef CUSTOM_FAILED_LOGIN
-@@ -599,7 +604,7 @@ getpwnamallow(struct ssh *ssh, const char *user)
- 	if (!allowed_user(ssh, pw))
+--- UTC
+r100838 | fanf | 2002-07-28 19:36:24 -0500 (Sun, 28 Jul 2002) | 7 lines
+Changed paths:
+   M /head/crypto/openssh/auth.c
+
+Use login_getpwclass() instead of login_getclass() so that the root
+vs. default login class distinction is made correctly.
+
+PR:             37416
+
+--- auth.c.orig	2010-08-12 11:33:01.000000000 -0600
++++ auth.c	2010-09-14 16:14:12.000000000 -0600
+@@ -594,7 +594,7 @@
+ 	if (!allowed_user(pw))
  		return (NULL);
  #ifdef HAVE_LOGIN_CAP
 -	if ((lc = login_getclass(pw->pw_class)) == NULL) {

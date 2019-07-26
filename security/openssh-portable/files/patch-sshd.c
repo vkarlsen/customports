@@ -1,5 +1,40 @@
---- sshd.c.orig	2019-07-19 21:23:24 UTC
-+++ sshd.c
+--- UTC
+r109683 | des | 2003-01-22 08:12:59 -0600 (Wed, 22 Jan 2003) | 7 lines
+Changed paths:
+   M /head/crypto/openssh/sshd.c
+
+Force early initialization of the resolver library, since the resolver
+configuration files will no longer be available once sshd is chrooted.
+
+PR:             39953, 40894
+Submitted by:   dinoex
+
+r199804 | attilio | 2009-11-25 09:12:24 -0600 (Wed, 25 Nov 2009) | 13 lines
+Changed paths:
+   M /head/crypto/openssh/sshd.c
+   M /head/usr.sbin/cron/cron/cron.c
+   M /head/usr.sbin/inetd/inetd.c
+   M /head/usr.sbin/syslogd/syslogd.c
+
+Avoid sshd, cron, syslogd and inetd to be killed under high-pressure swap
+environments.
+Please note that this can't be done while such processes run in jails.
+
+Note: in future it would be interesting to find a way to do that
+selectively for any desired proccess (choosen by user himself), probabilly
+via a ptrace interface or whatever.
+
+r206397 | kib | 2010-04-08 07:07:40 -0500 (Thu, 08 Apr 2010) | 8 lines
+Changed paths:
+   M /head/crypto/openssh/sshd.c
+
+Enhance r199804 by marking the daemonised child as immune to OOM instead
+of short-living parent. Only mark the master process that accepts
+connections, do not protect connection handlers spawned from inetd.
+
+
+--- sshd.c.orig	2010-04-15 23:56:22.000000000 -0600
++++ sshd.c	2010-09-14 16:14:13.000000000 -0600
 @@ -46,6 +46,7 @@
  
  #include <sys/types.h>
@@ -8,7 +43,7 @@
  #include <sys/socket.h>
  #ifdef HAVE_SYS_STAT_H
  # include <sys/stat.h>
-@@ -85,6 +86,13 @@
+@@ -83,6 +84,13 @@
  #include <prot.h>
  #endif
  
@@ -21,25 +56,8 @@
 +
  #include "xmalloc.h"
  #include "ssh.h"
- #include "ssh2.h"
-@@ -122,6 +130,7 @@
- #include "auth-options.h"
- #include "version.h"
- #include "ssherr.h"
-+#include "blacklist_client.h"
- 
- #ifdef LIBWRAP
- #include <tcpd.h>
-@@ -376,6 +385,8 @@ grace_alarm_handler(int sig)
- 		kill(0, SIGTERM);
- 	}
- 
-+    BLACKLIST_NOTIFY(BLACKLIST_AUTH_FAIL, "ssh");
-+
- 	/* XXX pre-format ipaddr/port so we don't need to access active_state */
- 	/* Log error and exit. */
- 	sigdie("Timeout before authentication for %s port %d",
-@@ -1905,6 +1916,10 @@ main(int ac, char **av)
+ #include "ssh1.h"
+@@ -1877,6 +1885,10 @@
  	/* Reinitialize the log (because of the fork above). */
  	log_init(__progname, options.log_level, options.log_facility, log_stderr);
  
@@ -50,12 +68,12 @@
  	/* Chdir to the root directory so that the current disk can be
  	   unmounted if desired. */
  	if (chdir("/") == -1)
-@@ -2020,7 +2035,30 @@ main(int ac, char **av)
+@@ -1995,6 +2007,29 @@
  	signal(SIGCHLD, SIG_DFL);
  	signal(SIGINT, SIG_DFL);
  
 +#ifdef __FreeBSD__
- 	/*
++	/*
 +	 * Initialize the resolver.  This may not happen automatically
 +	 * before privsep chroot().
 +	 */
@@ -77,16 +95,6 @@
 +#endif
 +#endif
 +
-+	/*
+ 	/*
  	 * Register our connection.  This turns encryption off because we do
  	 * not have a key.
- 	 */
-@@ -2124,6 +2162,8 @@ main(int ac, char **av)
- 	if ((loginmsg = sshbuf_new()) == NULL)
- 		fatal("%s: sshbuf_new failed", __func__);
- 	auth_debug_reset();
-+
-+    BLACKLIST_INIT();
- 
- 	if (use_privsep) {
- 		if (privsep_preauth(ssh) == 1)
