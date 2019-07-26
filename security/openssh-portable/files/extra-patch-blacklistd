@@ -18,14 +18,22 @@
  
  MANPAGES	= moduli.5.out scp.1.out ssh-add.1.out ssh-agent.1.out ssh-keygen.1.out ssh-keyscan.1.out ssh.1.out sshd.8.out sftp-server.8.out sftp.1.out ssh-keysign.8.out ssh-pkcs11-helper.8.out sshd_config.5.out ssh_config.5.out
  MANPAGES_IN	= moduli.5 scp.1 ssh-add.1 ssh-agent.1 ssh-keygen.1 ssh-keyscan.1 ssh.1 sshd.8 sftp-server.8 sftp.1 ssh-keysign.8 ssh-pkcs11-helper.8 sshd_config.5 ssh_config.5
-@@ -193,8 +193,8 @@ ssh-keysign$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-keysig
+@@ -187,14 +187,14 @@ ssh-agent$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-agent.o 
+ ssh-keygen$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-keygen.o
+ 	$(LD) -o $@ ssh-keygen.o $(LDFLAGS) -lssh -lopenbsd-compat $(LIBS)
+ 
+-ssh-keysign$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-keysign.o readconf.o uidswap.o compat.o
+-	$(LD) -o $@ ssh-keysign.o readconf.o uidswap.o $(LDFLAGS) -lssh -lopenbsd-compat $(LIBS)
++ssh-keysign$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-keysign.o readconf.o uidswap.o compat.o blacklist.o
++	$(LD) -o $@ ssh-keysign.o readconf.o uidswap.o blacklist.o $(LDFLAGS) -lssh -lopenbsd-compat $(LIBS)
+ 
  ssh-pkcs11-helper$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-pkcs11-helper.o ssh-pkcs11.o
  	$(LD) -o $@ ssh-pkcs11-helper.o ssh-pkcs11.o $(LDFLAGS) -lssh -lopenbsd-compat -lssh -lopenbsd-compat $(LIBS)
  
 -ssh-keyscan$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-keyscan.o
 -	$(LD) -o $@ ssh-keyscan.o $(LDFLAGS) -lssh -lopenbsd-compat -lssh $(LIBS)
 +ssh-keyscan$(EXEEXT): $(LIBCOMPAT) libssh.a ssh-keyscan.o blacklist.o
-+	$(LD) -o $@ ssh-keyscan.o $(LDFLAGS) -lssh -lopenbsd-compat -lssh $(LIBS) blacklist.o
++	$(LD) -o $@ ssh-keyscan.o blacklist.o $(LDFLAGS) -lssh -lopenbsd-compat -lssh $(LIBS)
  
  sftp-server$(EXEEXT): $(LIBCOMPAT) libssh.a sftp.o sftp-common.o sftp-server.o sftp-server-main.o
  	$(LD) -o $@ sftp-server.o sftp-common.o sftp-server-main.o $(LDFLAGS) -lssh -lopenbsd-compat $(LIBS)
@@ -153,7 +161,7 @@
 +static struct blacklist *blstate = NULL;
 +
 +/* import */
-+extern ServerOptions options;
++/* extern ServerOptions options; */
 +
 +/* internal definition from bl.h */
 +struct blacklist *bl_create(bool, char *, void (*)(int, const char *, va_list));
@@ -184,7 +192,7 @@
 +blacklist_init(void)
 +{
 +
-+	if (options.use_blacklist)
++/*	if (options.use_blacklist) */
 +		blstate = bl_create(false, NULL, im_log);
 +}
 +

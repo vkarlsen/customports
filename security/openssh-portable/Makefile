@@ -76,8 +76,8 @@ OPTIONS_SUB=		yes
 #BLACKLISTD_MAKE_ARGS=		USE_LIBBLACKLIST=yes
 #BLACKLISTD_CONFIGURE_ENV=	LIBS="-L/usr/lib -lblacklist"
 #BLACKLISTD_CFLAGS=		-DUSE_BLACKLIST -I${WRKSRC}/contrib/blacklist/include -I/usr/include
-BLACKLISTD_CFLAGS=		-DUSE_BLACKLIST=1 -I/usr/include # -I${WRKSRC}/contrib/blacklist/include
-BLACKLISTD_CPPFLAGS=		-DUSE_BLACKLIST=1 -I/usr/include
+BLACKLISTD_CFLAGS=		-DUSE_BLACKLIST -I/usr/include # -I${WRKSRC}/contrib/blacklist/include
+BLACKLISTD_CPPFLAGS=		-DUSE_BLACKLIST -I/usr/include
 BLACKLISTD_LIBS=		-lblacklist
 BLACKLISTD_CONFIGURE_LIBS=	-lblacklist
 #BLACKLISTD_LDFLAGS=		-L${WRKSRC}/contrib/blacklist/lib -L/usr/lib
