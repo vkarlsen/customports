@@ -7,8 +7,10 @@ CATEGORIES=	sysutils
 MAINTAINER=	vidar@karlsen.tech
 COMMENT=	All-in-one command line
 
-LICENSE=	BSD2CLAUSE
+LICENSE=	0BSD
+LICENSE_NAME=	BSD Zero Clause License
 LICENSE_FILE=	${WRKSRC}/LICENSE
+LICENSE_PERMS=	dist-mirror dist-sell pkg-mirror pkg-sell auto-accept
 
 BUILD_DEPENDS=	bash:shells/bash gsed:textproc/gsed
 LIB_DEPENDS=	libinotify.so:devel/libinotify
