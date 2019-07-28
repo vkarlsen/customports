@@ -34,15 +34,9 @@ post-patch:
 .endfor
 	@${REINPLACE_CMD} -e 's|<sys/inotify.h>|"${LOCALBASE}/include/sys/inotify.h"|' \
 		${WRKSRC}/lib/portability.c
-	@${REINPLACE_CMD} -e 's|-Werror=implicit-function-declaration||' \
-		${WRKSRC}/configure
-	@${REINPLACE_CMD} -e 's|-Wundef||' ${WRKSRC}/configure
 
 do-configure:
 	cd ${WRKSRC} && ${GMAKE} bsd_defconfig
-
-do-build:
-	cd ${WRKSRC} && ${GMAKE}
 
 do-install:
 	${INSTALL_PROGRAM} ${WRKSRC}/toybox ${STAGEDIR}${PREFIX}/bin
