@@ -1,7 +1,7 @@
-# $FreeBSD: head/ports-mgmt/pkg/Makefile 503177 2019-05-31 14:59:44Z bapt $
+# $FreeBSD: head/ports-mgmt/pkg/Makefile 512256 2019-09-18 07:37:56Z bapt $
 
 PORTNAME=	pkg
-DISTVERSION=	1.11.1
+DISTVERSION=	1.12.0
 PORTREVISION=	1
 _PKG_VERSION=	${DISTVERSION}
 CATEGORIES=	ports-mgmt
@@ -22,7 +22,8 @@ USE_LDCONFIG=	yes
 HAS_CONFIGURE=	yes
 PORTDOCS=	NEWS
 PORTSCOUT=	ignore:1
-CONFIGURE_ARGS=	--mandir=${PREFIX}/man
+CONFIGURE_ARGS=	--mandir=${PREFIX}/man --prefix="${PREFIX}"
+CONFIGURE_ENV=	CC_FOR_BUILD="${CC}"
 
 # Use a submake as 'deinstall install' needs to reevaluate PKG_CMD
 # so that pkg-static is used from the wrkdir
