@@ -30,9 +30,9 @@ GH_ACCOUNT=	landley
 
 post-patch:
 .for f in ${SHEBANG}
-	@${REINPLACE_CMD} -e 's|/bin/bash|${LOCALBASE}/bin/bash|' ${WRKSRC}/${f}
+	${REINPLACE_CMD} -e 's|/bin/bash|${LOCALBASE}/bin/bash|' ${WRKSRC}/${f}
 .endfor
-	@${REINPLACE_CMD} -e 's|<sys/inotify.h>|"${LOCALBASE}/include/sys/inotify.h"|' \
+	${REINPLACE_CMD} -e 's|<sys/inotify.h>|"${LOCALBASE}/include/sys/inotify.h"|' \
 		${WRKSRC}/lib/portability.c
 
 do-configure:

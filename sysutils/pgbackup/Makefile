@@ -15,7 +15,7 @@ NO_BUILD=	yes
 NO_ARCH=	yes
 
 do-install:
-	@${MKDIR} ${STAGEDIR}${PREFIX}/pgbackups
+	${MKDIR} ${STAGEDIR}${PREFIX}/pgbackups
 	${INSTALL_SCRIPT} ${FILESDIR}/pgbackup ${STAGEDIR}${PREFIX}/bin
 
 .include <bsd.port.mk>

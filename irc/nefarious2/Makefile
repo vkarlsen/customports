@@ -46,12 +46,12 @@ CONFIGURE_ARGS+=	--prefix=${PREFIX} \
 			--localstatedir=/var/run/${PORTNAME}
 
 post-patch:
-	@${REINPLACE_CMD} -e 's|ircd.log|/var/log/nefarious2/ircd.log|' ${WRKSRC}/doc/example.conf
-	@${REINPLACE_CMD} -e 's|PREFIX|${PREFIX}|' ${WRKSRC}/tools/makepem/makepem
-	@${REINPLACE_CMD} -e 's|PORTNAME|${PORTNAME}|' ${WRKSRC}/tools/makepem/makepem
+	${REINPLACE_CMD} -e 's|ircd.log|/var/log/nefarious2/ircd.log|' ${WRKSRC}/doc/example.conf
+	${REINPLACE_CMD} -e 's|PREFIX|${PREFIX}|' ${WRKSRC}/tools/makepem/makepem
+	${REINPLACE_CMD} -e 's|PORTNAME|${PORTNAME}|' ${WRKSRC}/tools/makepem/makepem
 
 do-install:
-	@${MKDIR} ${STAGEDIR}${PREFIX}/etc/${PORTNAME}
+	${MKDIR} ${STAGEDIR}${PREFIX}/etc/${PORTNAME}
 	${INSTALL_PROGRAM} ${WRKSRC}/ircd/ircd ${STAGEDIR}${PREFIX}/bin
 	${INSTALL_PROGRAM} ${WRKSRC}/ircd/umkpasswd ${STAGEDIR}${PREFIX}/bin
 	${INSTALL_PROGRAM} ${WRKSRC}/ircd/convert-conf ${STAGEDIR}${PREFIX}/bin

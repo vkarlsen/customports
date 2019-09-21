@@ -24,7 +24,7 @@ NO_ARCH=	yes
 PLIST_FILES=	bin/phpmd
 
 do-extract:
-	@${MKDIR} ${WRKSRC}/
+	${MKDIR} ${WRKSRC}/
 	${CP} ${_DISTDIR}/${PORTNAME}.phar ${WRKSRC}/
 
 do-install:

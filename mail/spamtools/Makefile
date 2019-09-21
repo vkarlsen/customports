@@ -15,7 +15,7 @@ NO_BUILD=	yes
 NO_ARCH=	yes
 
 do-install:
-	@${MKDIR} ${STAGEDIR}${PREFIX}/etc/traplists
+	${MKDIR} ${STAGEDIR}${PREFIX}/etc/traplists
 	${INSTALL_SCRIPT} ${FILESDIR}/addspammer ${STAGEDIR}${PREFIX}/bin
 	${INSTALL_SCRIPT} ${FILESDIR}/fetchtraplist ${STAGEDIR}${PREFIX}/bin
 
