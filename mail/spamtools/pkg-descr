@@ -1,5 +1,6 @@
 A small collection of scripts for handling blacklists for Postfix:
 - addspammer: add a spamming mail server to the blacklist
+- maketraplist: get external lists and make postfix traplists of them
 - fetchtraplist: rsync the traplists from other hosts
 
 Please note that these scripts contain static values that are valid
