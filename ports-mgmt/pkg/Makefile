@@ -1,9 +1,9 @@
 # $FreeBSD: head/ports-mgmt/pkg/Makefile 512256 2019-09-18 07:37:56Z bapt $
 
 PORTNAME=	pkg
-DISTVERSION=	1.12.0
+DISTVERSION=	1.13.2
 _PKG_VERSION=	${DISTVERSION}
-PORTREVISION=	2
+PORTREVISION=	1
 CATEGORIES=	ports-mgmt
 #MASTER_SITES=	\
 #		http://files.etoilebsd.net/${PORTNAME}/ \
