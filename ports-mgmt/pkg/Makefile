@@ -1,4 +1,4 @@
-# $FreeBSD: head/ports-mgmt/pkg/Makefile 512256 2019-09-18 07:37:56Z bapt $
+# $FreeBSD: head/ports-mgmt/pkg/Makefile 526628 2020-02-21 14:24:58Z bapt $
 
 PORTNAME=	pkg
 DISTVERSION=	1.13.2
@@ -83,7 +83,7 @@ PKG_BIN=	${WRKSRC}/src/pkg-static
 .endif
 
 post-install-DOCS-on:
-	${MKDIR} ${STAGEDIR}${DOCSDIR}
+	@${MKDIR} ${STAGEDIR}${DOCSDIR}
 	${INSTALL_DATA} ${WRKSRC}/NEWS ${STAGEDIR}${DOCSDIR}/NEWS
 
 .include <bsd.port.post.mk>
