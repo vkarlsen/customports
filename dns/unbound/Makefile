@@ -1,8 +1,8 @@
 # Created by: Sergey Matveychuk <sem@FreeBSD.org>
-# $FreeBSD: head/dns/unbound/Makefile 520238 2019-12-16 09:44:06Z joneum $
+# $FreeBSD: head/dns/unbound/Makefile 535884 2020-05-19 19:02:46Z delphij $
 
 PORTNAME=	unbound
-PORTVERSION=	1.10.0
+PORTVERSION=	1.10.1
 PORTREVISION=	1
 CATEGORIES=	dns
 MASTER_SITES=	https://www.nlnetlabs.nl/downloads/unbound/ \
