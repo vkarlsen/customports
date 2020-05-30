@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	ub-split-map
-PORTVERSION=	0.1.1
+PORTVERSION=	0.2.0
 CATEGORIES=	dns python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
@@ -15,7 +15,7 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 RUN_DEPENDS+=	${PREFIX}/sbin/unbound:dns/unbound-python
 
-USES=		python:-2.7
+USES=		python
 
 USE_PYTHON=	distutils autoplist
 
