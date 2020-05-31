@@ -3,7 +3,7 @@
 
 PORTNAME=	unbound
 PORTVERSION=	1.10.1
-PORTREVISION=	1
+PORTREVISION=	2
 CATEGORIES=	dns
 MASTER_SITES=	https://www.nlnetlabs.nl/downloads/unbound/ \
 		https://distfiles.crux.guru/
@@ -77,7 +77,7 @@ PYTHON_BUILD_DEPENDS=	swig3.0:devel/swig30
 PYTHON_CONFIGURE_ON=	--with-pyunbound=yes --with-pythonmodule=yes \
 			LDFLAGS="-L${LOCALBASE}/lib" \
 			ac_cv_path_SWIG=${LOCALBASE}/bin/swig3.0
-PYTHON_USES=		python:-2.7
+PYTHON_USES=		python
 PYTHON_VARS=		STRIP_FILES+=.libs/_unbound.so
 THREADS_CONFIGURE_WITH=	pthreads
 HIREDIS_CONFIGURE_ON=	--enable-cachedb --with-libhiredis
