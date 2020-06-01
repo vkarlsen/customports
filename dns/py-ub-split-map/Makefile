@@ -13,7 +13,7 @@ COMMENT=	Unbound module to dynamically map external IPs to internal
 LICENSE=	GPLv2
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-RUN_DEPENDS+=	${PREFIX}/sbin/unbound:dns/unbound-python
+RUN_DEPENDS+=	${PREFIX}/sbin/unbound:dns/unbound
 
 USES=		python
 
