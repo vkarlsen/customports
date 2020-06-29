@@ -1,7 +1,7 @@
 # $FreeBSD: head/ports-mgmt/pkg/Makefile 539750 2020-06-20 21:22:55Z delphij $
 
 PORTNAME=	pkg
-DISTVERSION=	1.14.5
+DISTVERSION=	1.14.6
 PORTREVISION=	1
 _PKG_VERSION=	${DISTVERSION}
 CATEGORIES=	ports-mgmt
