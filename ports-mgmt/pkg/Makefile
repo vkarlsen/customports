@@ -1,8 +1,7 @@
-# $FreeBSD: head/ports-mgmt/pkg/Makefile 539750 2020-06-20 21:22:55Z delphij $
+# $FreeBSD: head/ports-mgmt/pkg/Makefile 545222 2020-08-18 08:23:44Z manu $
 
 PORTNAME=	pkg
-DISTVERSION=	1.14.6
-PORTREVISION=	1
+DISTVERSION=	1.14.7
 _PKG_VERSION=	${DISTVERSION}
 CATEGORIES=	ports-mgmt
 #MASTER_SITES=	\
