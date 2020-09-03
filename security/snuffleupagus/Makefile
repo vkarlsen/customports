@@ -22,7 +22,7 @@ USE_PHP=	hash:build session:build
 
 PLIST_FILES+=	etc/snuffleupagus.conf
 
-CONFIGURE_ARGS=	--enabe-snuffleupagus
+CONFIGURE_ARGS=	--enable-snuffleupagus
 
 TEST_TARGET=	test
 
