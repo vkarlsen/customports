@@ -1,7 +1,7 @@
 # $FreeBSD: head/ports-mgmt/pkg/Makefile 545222 2020-08-18 08:23:44Z manu $
 
 PORTNAME=	pkg
-DISTVERSION=	1.15.7
+DISTVERSION=	1.15.8
 PORTREVISION=	1
 _PKG_VERSION=	${DISTVERSION}
 CATEGORIES=	ports-mgmt
@@ -29,6 +29,7 @@ CONFIGURE_ENV=	CC_FOR_BUILD="${CC}"
 # so that pkg-static is used from the wrkdir
 USE_SUBMAKE=	yes
 CFLAGS+=	-Wno-error
+CFLAGS_powerpc64le=	-DSQLITE_BYTEORDER=1234
 
 OPTIONS_DEFINE=	DOCS
 
