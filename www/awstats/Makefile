@@ -29,7 +29,6 @@ OPTIONS_DEFINE=			DOCS GEOIPFREE IPV6
 OPTIONS_GROUP=			MODULES
 OPTIONS_DEFAULT=		HOSTINFO
 
-
 OPTIONS_GROUP_MODULES=		DECODEUTFKEYS HOSTINFO
 MODULES_DESC=			Plugin support not present in Perl CORE
 DECODEUTFKEYS_DESC=		DecodeUTFKeys (requires p5-URI)
@@ -65,19 +64,29 @@ post-patch:
 
 pre-install:
 .for f in dolibarr httpd_conf nginx webmin
-	@${MV} ${WRKSRC}/tools/$f ${WRKSRC}/docs
+	${MV} ${WRKSRC}/tools/$f ${WRKSRC}/docs
 .endfor
 
 do-install:
-	@${MKDIR} ${STAGEDIR}${WWWDIR}
-	(cd ${WRKSRC} && ${COPYTREE_SHARE} tools ${STAGEDIR}${WWWDIR})
-	(cd ${WRKSRC}/wwwroot && ${COPYTREE_SHARE} "cgi-bin css icon js" ${STAGEDIR}${WWWDIR})
-
-	@${MKDIR} ${STAGEDIR}${WWWDIR}/classes
+	${MKDIR} ${STAGEDIR}${WWWDIR}
+	${MKDIR} ${STAGEDIR}${WWWDIR}/tools
+	${MKDIR} ${STAGEDIR}${WWWDIR}/cgi-bin
+.for f in awstats_buildstaticpages.pl awstats_configure.pl \
+	awstats_exportlib.pl awstats_updateall.pl geoip_generator.pl \
+	logresolvemerge.pl maillogconvert.pl urlaliasbuilder.pl
+	${INSTALL_SCRIPT} ${WRKSRC}/tools/$f ${STAGEDIR}${WWWDIR}/tools
+.endfor
+.for f in awdownloadcsv.pl awredir.pl awstats.model.conf awstats.pl
+	${INSTALL_SCRIPT} ${WRKSRC}/wwwroot/cgi-bin/$f ${STAGEDIR}${WWWDIR}/cgi-bin
+.endfor
+	(cd ${WRKSRC}/wwwroot/cgi-bin && ${COPYTREE_SHARE} "lang lib plugins" ${STAGEDIR}${WWWDIR}/cgi-bin)
+	(cd ${WRKSRC}/wwwroot && ${COPYTREE_SHARE} "css icon js" ${STAGEDIR}${WWWDIR})
+	(cd ${WRKSRC}/tools && ${COPYTREE_SHARE} xslt ${STAGEDIR}${WWWDIR}/tools)
+	${MKDIR} ${STAGEDIR}${WWWDIR}/classes
 	${INSTALL_DATA} ${WRKSRC}/wwwroot/classes/awgraphapplet.jar ${STAGEDIR}${WWWDIR}/classes
 
 do-install-DOCS-on:
-	@${MKDIR} ${STAGEDIR}${DOCSDIR}
+	${MKDIR} ${STAGEDIR}${DOCSDIR}
 	(cd ${WRKSRC}/docs && ${COPYTREE_SHARE} . ${STAGEDIR}${DOCSDIR})
 
 .include <bsd.port.mk>
