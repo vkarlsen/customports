@@ -1,8 +1,8 @@
-# $FreeBSD: head/security/snuffleupagus/Makefile 505483 2019-06-30 20:29:36Z swills $
+# $FreeBSD: head/security/snuffleupagus/Makefile 562288 2021-01-22 10:09:04Z jhale $
 
 PORTNAME=	snuffleupagus
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.5.1
+DISTVERSION=	0.7.0
 PORTREVISION=	1
 CATEGORIES=	security
 PKGNAMEPREFIX=	${PHP_PKGNAMEPREFIX}
@@ -35,6 +35,6 @@ post-install:
 	${ECHO} 'sp.configuration_file=/usr/local/etc/snuffleupagus.conf' \
 		>> ${STAGEDIR}${PREFIX}/etc/php/ext-30-snuffleupagus.ini
 	${INSTALL_DATA} ${FILESDIR}/snuffleupagus.conf \
-		${STAGEDIR}${PREFIX}/etc/snuffleupagus.conf
+		${STAGEDIR}${PREFIX}/etc/snuffleupagus.conf	
 
 .include <bsd.port.mk>
