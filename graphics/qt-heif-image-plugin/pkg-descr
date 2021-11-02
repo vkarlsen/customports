@@ -1,0 +1,10 @@
+Qt image plugin for HEIF images, wrapping libheif.
+It enables existing Qt applications to open and save .heic files,
+such as those from Apple devices.
+
+Currently, support is limited to the following:
+
+  - Basic reading and writing of the primary image
+  - Reading of files with multiple top-level images
+
+WWW: https://github.com/jakar/qt-heif-image-plugin
