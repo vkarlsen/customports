@@ -1,3 +1,0 @@
-@sample %%ETCDIR%%/conf/app.ini.sample
-%%ETCDIR%%/conf/app.ini.defaults
-sbin/forgejo
