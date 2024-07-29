@@ -1,6 +1,6 @@
 --- CMakeLists.txt.orig	2020-12-12 09:55:17 UTC
 +++ CMakeLists.txt
-@@ -7,12 +7,15 @@ include(CTest)
+@@ -7,12 +7,15 @@ option(USE_APPARMOR "Enable AppArmor profile" OFF)
  
  option(GENERATE_SRS_SECRET "Generate a random SRS secret if none exists during install" ON)
  option(USE_APPARMOR "Enable AppArmor profile" OFF)
@@ -17,7 +17,7 @@
  set(DOC_DIR "share/doc/${PROJECT_NAME}" CACHE PATH "Path for documentation files")
  mark_as_advanced(CHROOT_DIR SYSCONF_DIR SYSD_UNIT_DIR CONFIG_DIR DOC_DIR)
  
-@@ -20,8 +23,6 @@ find_program(HELP2MAN help2man DOC "path to help2man e
+@@ -20,8 +23,6 @@ find_program(OPENSSL openssl DOC "path to OpenSSL exec
  find_program(DD dd DOC "path to dd executable")
  find_program(BASE64 base64 DOC "path to base64 executable")
  find_program(OPENSSL openssl DOC "path to OpenSSL executable")
@@ -26,7 +26,7 @@
  find_program(SYSTEMCTL systemctl DOC "path to systemctl executable")
  
  if(CMAKE_SYSTEM_NAME MATCHES "SunOS")
-@@ -69,23 +70,6 @@ endif()
+@@ -69,23 +70,6 @@ add_definitions(-DSIZEOF_UNSIGNED_LONG=${SIZEOF_UNSIGN
  check_type_size("unsigned long" SIZEOF_UNSIGNED_LONG)
  add_definitions(-DSIZEOF_UNSIGNED_LONG=${SIZEOF_UNSIGNED_LONG})
  
@@ -50,7 +50,7 @@
  add_definitions(-DPOSTSRSD_VERSION=\"${PROJECT_VERSION}\")
  add_executable(${PROJECT_NAME} postsrsd.c sha1.c srs2.c)
  
-@@ -95,16 +79,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "SunOS")
+@@ -95,16 +79,8 @@ set(POSTSRSD "${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX
  endif()
  
  set(POSTSRSD "${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
@@ -67,16 +67,7 @@
  
  configure_file(postinstall.cmake.in postinstall.cmake @ONLY)
  
-@@ -118,7 +94,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
- 	COMMAND ${HELP2MAN} ARGS -s8 -o${PROJECT_NAME}.8 -n "Postfix Sender Rewriting Scheme daemon" -N -h-h -v-v ${CMAKE_CURRENT_BINARY_DIR}/${POSTSRSD}
- 	VERBATIM
- )
--install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.8 DESTINATION "share/man/man8")
-+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.8 DESTINATION "man/man8")
- endif()
- 
- if(USE_APPARMOR)
-@@ -135,6 +111,8 @@ if(USE_SELINUX)
+@@ -135,6 +111,8 @@ install(TARGETS ${PROJECT_NAME} DESTINATION "sbin")
  endif()
  
  install(TARGETS ${PROJECT_NAME} DESTINATION "sbin")
