@@ -23,7 +23,7 @@ CMAKE_ARGS=	--no-warn-unused-cli \
 		-DCMAKE_INCLUDE_PATH="${LOCALBASE}/include" \
 		-DCMAKE_LIBRARY_PATH="${LOCALBASE}/lib"
 
-PLIST_FILES=	man/man8/postsrsd.8.gz \
+PLIST_FILES=	share/man/man8/postsrsd.8.gz \
 		sbin/postsrsd
 
 PORTDOCS=	README.md README_UPGRADE.md main.cf.ex
