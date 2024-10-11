@@ -1,5 +1,5 @@
 PORTNAME=	hermodr
-DISTVERSION=	g20241009
+DISTVERSION=	g20241011
 CATEGORIES=	sysutils
 
 MAINTAINER=	vidar@karlsen.tech
@@ -12,7 +12,7 @@ RUN_DEPENDS=	curl>0:ftp/curl
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	vkarlsen
-GH_TAGNAME=	c288c44
+GH_TAGNAME=	a92cb83
 
 NO_ARCH=	yes
 NO_BUILD=	yes
