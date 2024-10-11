@@ -1,0 +1,3 @@
+Hermodr is a simple system alert thingie. It runs a number of checks,
+called scouts, that send a notification if a non-acceptable condition
+is detected.
