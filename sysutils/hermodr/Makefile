@@ -1,5 +1,5 @@
 PORTNAME=	hermodr
-DISTVERSION=	g20241011
+DISTVERSION=	0.0.2
 CATEGORIES=	sysutils
 
 MAINTAINER=	vidar@karlsen.tech
@@ -12,7 +12,6 @@ RUN_DEPENDS=	curl>0:ftp/curl
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	vkarlsen
-GH_TAGNAME=	a92cb83
 
 NO_ARCH=	yes
 NO_BUILD=	yes
@@ -21,6 +20,7 @@ do-install:
 	${INSTALL_SCRIPT} ${WRKSRC}/bin/hermodr ${STAGEDIR}${PREFIX}/bin
 	${MKDIR} ${STAGEDIR}${PREFIX}/libexec/hermodr/scouts
 	${INSTALL_SCRIPT} ${WRKSRC}/libexec/hermodr/common ${STAGEDIR}${PREFIX}/libexec/hermodr
+	${INSTALL_SCRIPT} ${WRKSRC}/libexec/hermodr/defaults.conf ${STAGEDIR}${PREFIX}/libexec/hermodr
 	${INSTALL_SCRIPT} ${WRKSRC}/libexec/hermodr/scouts/* ${STAGEDIR}${PREFIX}/libexec/hermodr/scouts
 	${INSTALL_DATA} ${WRKSRC}/etc/hermodr.conf.sample ${STAGEDIR}${PREFIX}/etc
 
