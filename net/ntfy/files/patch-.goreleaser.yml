@@ -1,0 +1,11 @@
+--- .goreleaser.yml.orig	1979-11-29 23:00:00 UTC
++++ .goreleaser.yml
+@@ -11,7 +11,7 @@ builds:
+     tags: [sqlite_omit_load_extension,osusergo,netgo]
+     ldflags:
+       - "-linkmode=external -extldflags=-static -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}"
+-    goos: [linux]
++    goos: [freebsd]
+     goarch: [amd64]
+   -
+     id: ntfy_linux_armv6
