@@ -1,0 +1,5 @@
+[project]
+name = "certbot-dns-porkbun"
+version = "0.11.0"
+[tool.setuptools.packages.find]
+exclude = ["tests", "tests.*"]

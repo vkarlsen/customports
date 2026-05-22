@@ -1,0 +1,2 @@
+Plugin for certbot to obtain certificates using a DNS TXT record
+for Porkbun domains
