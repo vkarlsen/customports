@@ -1,0 +1,4 @@
+pkb_client is a python client for the Porkbun API.
+It supports the v3 of the API.
+You can find the official documentation of the Porkbun API at
+https://api.porkbun.com/api/json/v3/documentation
