@@ -5,6 +5,7 @@ libexec/hermodr/defaults.conf
 libexec/hermodr/scouts/cpu
 libexec/hermodr/scouts/cputemp
 libexec/hermodr/scouts/diskspace
+libexec/hermodr/scouts/letsencrypt
 libexec/hermodr/scouts/load
 libexec/hermodr/scouts/processes
 libexec/hermodr/scouts/zpool
